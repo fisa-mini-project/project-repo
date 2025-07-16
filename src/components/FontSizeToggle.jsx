@@ -2,7 +2,7 @@
 import React from 'react';
 import { fontSizes, fontSizeMap } from '../constants/fontSizes';
 import { useFontSize } from '../contexts/FontSizeContext';
-
+import styled from 'styled-components'
 // const fontSizes = ['small', 'medium', 'large', 'xlarge'];
 // const fontSizeMap = {
 //   small: '1rem',
