@@ -2,7 +2,7 @@ export async function requestGptSummary(text) {
   const apiKey = process.env.VITE_OPENAI_API_KEY
 
   const requestBody = {
-    model: 'gpt-3.5-turbo',
+    model: 'gpt-4',
     messages: [
       {
         role: 'system',
