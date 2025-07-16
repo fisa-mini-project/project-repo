@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { SummaryBox } from '../components/SummaryBox'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
 import { useGptSummary } from '../hooks/useGptSummary'
+import { useState } from 'react'
 
 const Container = styled.main`
   text-align: center;
@@ -69,14 +70,20 @@ const UrlText = styled.p`
 
 export const Popup = () => {
   const currentUrl = useCurrentTabUrl()
-  const { summary, showSummary, fetchSummaryFromStorage, speakSummary } = useGptSummary()
+  const { summary, fetchSummaryFromStorage, speakSummary } = useGptSummary()
+  const [showSummary, setShowSummary] = useState(false)
+
+  const handleSummarize = async () => {
+    await fetchSummaryFromStorage()
+    setTimeout(() => setShowSummary(true), 1000) // storage set 후 delay 고려
+  }
 
   return (
     <Container>
       <Title>FISA Google Chrome Extension</Title>
 
       <Actions>
-        <Button onClick={fetchSummaryFromStorage}>📝 요약하기</Button>
+        <Button onClick={handleSummarize}>📝 요약하기</Button>
         <Button onClick={speakSummary}>🔊 TTS 실행</Button>
       </Actions>
 

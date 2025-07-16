@@ -3,11 +3,11 @@ import FontSizeToggle from '../components/FontSizeToggle'
 import { fontSizeMap } from '../constants/fontSizes'
 import { SummaryBox } from '../components/SummaryBox'
 import { Modal } from '../components/Modal'
-import { createPortal } from 'react-dom';
+import { createPortal } from 'react-dom'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
 import { useGptSummary } from '../hooks/useGptSummary'
 import { useState } from 'react'
-import { useFontSize } from '../contexts/FontSizeContext';
+import { useFontSize } from '../contexts/FontSizeContext'
 
 const Container = styled.main`
   text-align: center;
@@ -84,8 +84,9 @@ const StyledLink = styled.a`
 
 export const SidePanel = () => {
   const currentUrl = useCurrentTabUrl()
-  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } = useGptSummary()
-  const {fontSizeLevel, setFontSizeLevel} = useFontSize();
+  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } =
+    useGptSummary()
+  const { fontSizeLevel, setFontSizeLevel } = useFontSize()
 
   return (
     <Container style={{ fontSize: fontSizeMap[fontSizeLevel] }}>
@@ -101,17 +102,16 @@ export const SidePanel = () => {
         <UrlText>{currentUrl}</UrlText>
       </UrlBox>
 
-
-      {openModal && summary && createPortal(
-        <Modal
-          onClose={() => setOpenModal(false)}
-          title={summary.title}
-          summary={summary.summary}
-        >
-        </Modal>,
-        document.body
-      )}
-
+      {openModal &&
+        summary &&
+        createPortal(
+          <Modal
+            onClose={() => setOpenModal(false)}
+            title={summary.title}
+            summary={summary.summary}
+          ></Modal>,
+          document.body,
+        )}
 
       <FontSizeToggle />
 
