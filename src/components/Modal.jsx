@@ -52,22 +52,12 @@ const Body = styled.p`
   line-height: 1.6;
 `
 
-const ModalBackdrop = styled.div`
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1;
-  backdrop-filter: blur(8px);
-`;
-
 
 export const Modal = ({ children, title, summary, onClose }) => {
     const { fontSizeLevel } = useFontSize();
     return (
         <>
-            {/* <div onClick={onClose} data-cy="modal-backdrop" className='fixed top-0 left-0 w-full h-full backdrop-blur-md z-1'></div> */}
-            {/* <ModalBackdrop onClick={onClose} data-cy="modal-backdrop" /> */}
+
 
             <Overlay onClick={onClose}>
                 <Box onClick={(e) => e.stopPropagation()} style={{ fontSize: fontSizeMap[fontSizeLevel] }} >
