@@ -63,8 +63,8 @@ export const Modal = ({ children, title, summary, onClose }) => {
                 <Box onClick={(e) => e.stopPropagation()} style={{ fontSize: fontSizeMap[fontSizeLevel] }} >
                     <Title>{title}</Title>
                     <Body>{summary}</Body>
-                    {children}
                 </Box>
+                {children}
             </Overlay>
         </>
 

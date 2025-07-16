@@ -11,6 +11,9 @@ import styled from 'styled-components'
 //   xlarge: '1.75rem',
 // };
 const Button = styled.button`
+position: fixed; 
+bottom: 10rem; 
+right: 1rem;
   background-color: #007acc;
   color: white;
   border: none;
@@ -21,6 +24,7 @@ const Button = styled.button`
   width: 85%;
   max-width: 300px;
   transition: background-color 0.2s ease-in-out;
+    z-index: 10000; 
 
   &:hover {
     background-color: #005999;
@@ -36,7 +40,8 @@ const FontSizeToggle = ({}) => {
 
   const {fontSizeLevel, setFontSizeLevel} = useFontSize();
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e.stopPropagation();
     const currentIndex = fontSizes.indexOf(fontSizeLevel);
     const nextIndex = (currentIndex + 1) % fontSizes.length;
     const nextSize = fontSizes[nextIndex];
