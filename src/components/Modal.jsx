@@ -1,4 +1,6 @@
 import styled from 'styled-components'
+import { useFontSize } from '../contexts/FontSizeContext';
+import { fontSizeMap } from '../constants/fontSizes';
 
 // const Box = styled.div`
 //   background-color: #f9f9f9;
@@ -23,6 +25,7 @@ const Overlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 9999;
+    backdrop-filter: blur(8px);
 `
 
 // 중앙 박스 (기존 Box 디자인 응용)
@@ -36,35 +39,38 @@ position: fixed;
   max-width: 90%;
   margin-inline: auto;
   white-space: pre-wrap;
+    z-index: 9999;
+
 `
 const Title = styled.h4`
-  color: #007acc;
+  font-size:0.9em;
+  color: #007ACC;
   margin-bottom: 0.5rem;
 `
-
 const Body = styled.p`
-  font-size: 0.95rem;
+  font-size: 0.65em;
   line-height: 1.6;
 `
 
-// const ModalBackdrop = styled.div`
-//   position: fixed;
-//   top: 0; left: 0;
-//   width: 100vw;
-//   height: 100vh;
-//   z-index: 1;
-//   backdrop-filter: blur(8px);
-// `;
+const ModalBackdrop = styled.div`
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  backdrop-filter: blur(8px);
+`;
 
 
 export const Modal = ({ children, title, summary, onClose }) => {
+    const { fontSizeLevel } = useFontSize();
     return (
         <>
             {/* <div onClick={onClose} data-cy="modal-backdrop" className='fixed top-0 left-0 w-full h-full backdrop-blur-md z-1'></div> */}
             {/* <ModalBackdrop onClick={onClose} data-cy="modal-backdrop" /> */}
 
             <Overlay onClick={onClose}>
-                <Box>
+                <Box onClick={(e) => e.stopPropagation()} style={{ fontSize: fontSizeMap[fontSizeLevel] }} >
                     <Title>{title}</Title>
                     <Body>{summary}</Body>
                     {children}
