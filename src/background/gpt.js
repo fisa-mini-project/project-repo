@@ -14,7 +14,13 @@ export async function requestGptSummary(text) {
   "summary": "핵심 내용을 광고 없이 쉽게 풀어쓴 요약문. 3~5줄 분량으로, 핵심 개념과 내용을 자세하게 설명할 것"
 }
 
-⚠️ 반드시 JSON 형태로만 응답해줘. 불필요한 설명 없이 JSON 객체만 출력할 것.`,
+⚠️ 반드시 JSON 형태로만 응답해줘. 불필요한 설명 없이 JSON 객체만 출력할 것.
++ JSON key는 반드시 큰따옴표로 감싸고, value도 문자열일 경우 큰따옴표를 써야 해.
++ 예시:
++ {
++   "title": "제목 예시",
++   "summary": "요약 예시"
++ }`,
       },
       {
         role: 'user',
