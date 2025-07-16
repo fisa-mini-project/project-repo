@@ -6,7 +6,7 @@ export async function requestGptSummary(text) {
     messages: [
       {
         role: 'system',
-        content: `너는 시각장애인, 문해력이 낮은 사람들을 위해 정보를 요약하는 AI야.
+        content: `너는 시각장애인, 문해력이 낮은 사람들을 위해 사이트의 정보를 요약하는 AI야.
 아래 텍스트를 바탕으로 다음과 같은 JSON 형식으로 응답해줘:
 
 {
@@ -24,7 +24,7 @@ export async function requestGptSummary(text) {
     temperature: 0.7,
   }
 
-  // ✅ 여기에서 request body 콘솔 출력!
+  // Request Body
   console.log('[📤 GPT 요청 BODY]', JSON.stringify(requestBody, null, 2))
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -52,7 +52,7 @@ export async function requestGptSummary(text) {
       return JSON.parse(cleaned)
     } catch (e) {
       console.error('[❌ JSON 파싱 실패]', e)
-      return { title: '요약 실패', summary: rawText }
+      return { title: rawContent.title, summary: rawContent.summary }
     }
   }
   const rawContent = data.choices?.[0]?.message?.content ?? '{}'
@@ -61,6 +61,6 @@ export async function requestGptSummary(text) {
     return extractJsonFromText(rawContent)
   } catch (e) {
     console.error('[❌ JSON 파싱 실패]', e)
-    return { title: '요약 실패', summary: rawContent }
+    return { title: rawContent.title, summary: rawContent.summary }
   }
 }
