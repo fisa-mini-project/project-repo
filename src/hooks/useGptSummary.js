@@ -2,17 +2,17 @@ import { useState, useEffect, useCallback } from 'react'
 
 export const useGptSummary = () => {
   const [summary, setSummary] = useState(null)
-  const [showSummary, setShowSummary] = useState(false)
+  const [openModal, setOpenModal] = useState(false)
 
   const fetchSummaryFromStorage = useCallback(() => {
     chrome.storage.local.get(['gptSummary'], (res) => {
       console.log('[📦 GPT 요약 데이터]', res.gptSummary)
       if (res.gptSummary && typeof res.gptSummary === 'object') {
         setSummary(res.gptSummary)
-        setShowSummary(true)
+        setOpenModal(true)
       } else {
         setSummary({ title: '요약 없음', summary: '요약된 정보가 없습니다.' })
-        setShowSummary(true)
+        setOpenModal(true)
       }
     })
   }, [])
@@ -26,5 +26,5 @@ export const useGptSummary = () => {
     }
   }
 
-  return { summary, showSummary, fetchSummaryFromStorage, speakSummary }
+  return { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary }
 }

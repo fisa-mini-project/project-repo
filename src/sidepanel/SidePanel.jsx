@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import FontSizeToggle from '../components/FontSizeToggle'
 import { fontSizeMap } from '../constants/fontSizes'
 import { SummaryBox } from '../components/SummaryBox'
+import { Modal } from '../components/Modal'
+import { createPortal } from 'react-dom';
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
 import { useGptSummary } from '../hooks/useGptSummary'
 import { useState } from 'react'
@@ -23,7 +25,17 @@ const Title = styled.h3`
   line-height: 1.3;
   margin: 2rem auto;
 `
-
+const UrlBox = styled.div`
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1.5rem;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
+  margin-inline: auto;
+  white-space: pre-wrap;
+`
 const UrlText = styled.p`
   word-break: break-all;
   font-size: 1rem;
@@ -72,7 +84,7 @@ const StyledLink = styled.a`
 
 export const SidePanel = () => {
   const currentUrl = useCurrentTabUrl()
-  const { summary, showSummary, fetchSummaryFromStorage, speakSummary } = useGptSummary()
+  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } = useGptSummary()
   const {fontSizeLevel, setFontSizeLevel} = useFontSize();
 
   return (
@@ -85,9 +97,21 @@ export const SidePanel = () => {
       </Actions>
 
       <Title>현재 탭 URL</Title>
-      <UrlText>{currentUrl}</UrlText>
+      <UrlBox>
+        <UrlText>{currentUrl}</UrlText>
+      </UrlBox>
 
-      {showSummary && summary && <SummaryBox title={summary.title} summary={summary.summary} />}
+
+      {openModal && summary && createPortal(
+        <Modal
+          onClose={() => setOpenModal(false)}
+          title={summary.title}
+          summary={summary.summary}
+        >
+        </Modal>,
+        document.body
+      )}
+
 
       <FontSizeToggle />
 
