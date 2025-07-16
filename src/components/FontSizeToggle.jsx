@@ -1,7 +1,6 @@
-
-import React from 'react';
-import { fontSizes, fontSizeMap } from '../constants/fontSizes';
-import { useFontSize } from '../contexts/FontSizeContext';
+import React from 'react'
+import { fontSizes, fontSizeMap } from '../constants/fontSizes'
+import { useFontSize } from '../contexts/FontSizeContext'
 
 // const fontSizes = ['small', 'medium', 'large', 'xlarge'];
 // const fontSizeMap = {
@@ -12,21 +11,20 @@ import { useFontSize } from '../contexts/FontSizeContext';
 // };
 
 const FontSizeToggle = ({}) => {
-
-  const {fontSizeLevel, setFontSizeLevel} = useFontSize();
+  const { fontSizeLevel, setFontSizeLevel } = useFontSize()
 
   const handleClick = () => {
-    const currentIndex = fontSizes.indexOf(fontSizeLevel);
-    const nextIndex = (currentIndex + 1) % fontSizes.length;
-    const nextSize = fontSizes[nextIndex];
-    setFontSizeLevel(nextSize);
-  };
+    const currentIndex = fontSizes.indexOf(fontSizeLevel)
+    const nextIndex = (currentIndex + 1) % fontSizes.length
+    const nextSize = fontSizes[nextIndex]
+    setFontSizeLevel(nextSize)
+  }
 
   return (
     <button className="font-size-button" onClick={handleClick}>
-     글자 크기: {fontSizeLevel}
+      글자 크기: {fontSizeLevel}
     </button>
-  );
-};
+  )
+}
 
-export default FontSizeToggle;
+export default FontSizeToggle
