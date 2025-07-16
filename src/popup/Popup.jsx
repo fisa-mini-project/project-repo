@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
-import { SummaryBox } from '../components/SummaryBox'
 import styled from 'styled-components'
+import { SummaryBox } from '../components/SummaryBox'
+import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
+import { useGptSummary } from '../hooks/useGptSummary'
 
 const Container = styled.main`
   text-align: center;
@@ -67,47 +68,16 @@ const UrlText = styled.p`
 `
 
 export const Popup = () => {
-  const [currentUrl, setCurrentUrl] = useState('')
-  const [summary, setSummary] = useState(null)
-  const [showSummary, setShowSummary] = useState(false)
-
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        setCurrentUrl(tabs[0].url)
-      }
-    })
-  }, [])
-
-  const handleSummarize = () => {
-    chrome.storage.local.get(['gptSummary'], (res) => {
-      console.log('[📦 popup에서 받은 요약]', res.gptSummary)
-      if (res.gptSummary && typeof res.gptSummary === 'object') {
-        setSummary(res.gptSummary)
-        setShowSummary(true)
-      } else {
-        setSummary({ title: '요약 없음', summary: '요약된 정보가 없습니다.' })
-        setShowSummary(true)
-      }
-    })
-  }
-
-  const handleTTS = () => {
-    if (summary?.summary) {
-      const utterance = new SpeechSynthesisUtterance(summary.summary)
-      speechSynthesis.speak(utterance)
-    } else {
-      alert('요약된 내용이 없습니다.')
-    }
-  }
+  const currentUrl = useCurrentTabUrl()
+  const { summary, showSummary, fetchSummaryFromStorage, speakSummary } = useGptSummary()
 
   return (
     <Container>
       <Title>FISA Google Chrome Extension</Title>
 
       <Actions>
-        <Button onClick={handleSummarize}>📝 요약하기</Button>
-        <Button onClick={handleTTS}>🔊 TTS 실행</Button>
+        <Button onClick={fetchSummaryFromStorage}>📝 요약하기</Button>
+        <Button onClick={speakSummary}>🔊 TTS 실행</Button>
       </Actions>
 
       <Title>현재 탭 URL</Title>
