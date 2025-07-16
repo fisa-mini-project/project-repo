@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import FontSizeToggle from '../components/FontSizeToggle'
 import { fontSizeMap } from '../constants/fontSizes'
 import { SummaryBox } from '../components/SummaryBox'
 import { Modal } from '../components/Modal'
 import { createPortal } from 'react-dom';
+import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
+import { useGptSummary } from '../hooks/useGptSummary'
+import { useState } from 'react'
+import { useFontSize } from '../contexts/FontSizeContext';
 
 const Container = styled.main`
   text-align: center;
@@ -80,69 +83,17 @@ const StyledLink = styled.a`
 `
 
 export const SidePanel = () => {
-  const [currentUrl, setCurrentUrl] = useState('')
-  const [fontSizeLevel, setFontSizeLevel] = useState('medium')
-  const [summary, setSummary] = useState(null)
-  // const [showSummary, setShowSummary] = useState(false)
-  const [openModal, setOpenModal] = useState(false)
-
-  const fontSizeStyle = {
-    fontSize: fontSizeMap[fontSizeLevel],
-  }
-
-  const fetchCurrentTabUrl = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        setCurrentUrl(tabs[0].url)
-      }
-    })
-  }
-
-  useEffect(() => {
-    fetchCurrentTabUrl()
-    chrome.tabs.onActivated.addListener(fetchCurrentTabUrl)
-
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      if (tab.active && changeInfo.url) {
-        setCurrentUrl(changeInfo.url)
-      }
-    })
-
-    return () => {
-      chrome.tabs.onActivated.removeListener(fetchCurrentTabUrl)
-      chrome.tabs.onUpdated.removeListener(() => { })
-    }
-  }, [])
-
-  const handleSummarize = () => {
-    chrome.storage.local.get(['gptSummary'], (res) => {
-      console.log('[📦 sidepanel에서 받은 요약]', res.gptSummary)
-      if (res.gptSummary && typeof res.gptSummary === 'object') {
-        setSummary(res.gptSummary)
-        setOpenModal(true)
-      } else {
-        setSummary({ title: '요약 없음', summary: '요약된 정보가 없습니다.' })
-        setOpenModal(true)
-      }
-    })
-  }
-
-  const handleTTS = () => {
-    if (summary?.summary) {
-      const utterance = new SpeechSynthesisUtterance(summary.summary)
-      speechSynthesis.speak(utterance)
-    } else {
-      alert('요약된 내용이 없습니다.')
-    }
-  }
+  const currentUrl = useCurrentTabUrl()
+  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } = useGptSummary()
+  const {fontSizeLevel, setFontSizeLevel} = useFontSize();
 
   return (
-    <Container style={fontSizeStyle}>
+    <Container style={{ fontSize: fontSizeMap[fontSizeLevel] }}>
       <Title>FISA Extension</Title>
 
       <Actions>
-        <Button onClick={handleSummarize}>📝 요약하기</Button>
-        <Button onClick={handleTTS}>🔊 TTS 실행</Button>
+        <Button onClick={fetchSummaryFromStorage}>📝 요약하기</Button>
+        <Button onClick={speakSummary}>🔊 TTS 실행</Button>
       </Actions>
 
       <Title>현재 탭 URL</Title>
@@ -162,7 +113,8 @@ export const SidePanel = () => {
       )}
 
 
-      <FontSizeToggle currentSize={fontSizeLevel} onChange={setFontSizeLevel} />
+      <FontSizeToggle />
+
       <StyledLink
         href="https://github.com/guocaoyi/create-chrome-ext"
         target="_blank"
