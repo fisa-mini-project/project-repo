@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import FontSizeToggle from '../components/FontSizeToggle'
 import { fontSizeMap } from '../constants/fontSizes'
 import { SummaryBox } from '../components/SummaryBox'
+import { Modal } from '../components/Modal'
+import { createPortal } from 'react-dom';
 
 const Container = styled.main`
   text-align: center;
@@ -20,7 +22,17 @@ const Title = styled.h3`
   line-height: 1.3;
   margin: 2rem auto;
 `
-
+const UrlBox = styled.div`
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1.5rem;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
+  margin-inline: auto;
+  white-space: pre-wrap;
+`
 const UrlText = styled.p`
   word-break: break-all;
   font-size: 1rem;
@@ -71,7 +83,8 @@ export const SidePanel = () => {
   const [currentUrl, setCurrentUrl] = useState('')
   const [fontSizeLevel, setFontSizeLevel] = useState('medium')
   const [summary, setSummary] = useState(null)
-  const [showSummary, setShowSummary] = useState(false)
+  // const [showSummary, setShowSummary] = useState(false)
+  const [openModal, setOpenModal] = useState(false)
 
   const fontSizeStyle = {
     fontSize: fontSizeMap[fontSizeLevel],
@@ -97,7 +110,7 @@ export const SidePanel = () => {
 
     return () => {
       chrome.tabs.onActivated.removeListener(fetchCurrentTabUrl)
-      chrome.tabs.onUpdated.removeListener(() => {})
+      chrome.tabs.onUpdated.removeListener(() => { })
     }
   }, [])
 
@@ -106,10 +119,10 @@ export const SidePanel = () => {
       console.log('[📦 sidepanel에서 받은 요약]', res.gptSummary)
       if (res.gptSummary && typeof res.gptSummary === 'object') {
         setSummary(res.gptSummary)
-        setShowSummary(true)
+        setOpenModal(true)
       } else {
         setSummary({ title: '요약 없음', summary: '요약된 정보가 없습니다.' })
-        setShowSummary(true)
+        setOpenModal(true)
       }
     })
   }
@@ -133,12 +146,23 @@ export const SidePanel = () => {
       </Actions>
 
       <Title>현재 탭 URL</Title>
-      <UrlText>{currentUrl}</UrlText>
+      <UrlBox>
+        <UrlText>{currentUrl}</UrlText>
+      </UrlBox>
 
-      {showSummary && summary && <SummaryBox title={summary.title} summary={summary.summary} />}
+
+      {openModal && summary && createPortal(
+        <Modal
+          onClose={() => setOpenModal(false)}
+          title={summary.title}
+          summary={summary.summary}
+        >
+        </Modal>,
+        document.body
+      )}
+
 
       <FontSizeToggle currentSize={fontSizeLevel} onChange={setFontSizeLevel} />
-
       <StyledLink
         href="https://github.com/guocaoyi/create-chrome-ext"
         target="_blank"
