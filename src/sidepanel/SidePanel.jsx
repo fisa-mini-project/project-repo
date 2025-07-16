@@ -5,6 +5,7 @@ import { SummaryBox } from '../components/SummaryBox'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
 import { useGptSummary } from '../hooks/useGptSummary'
 import { useState } from 'react'
+import { useFontSize } from '../contexts/FontSizeContext';
 
 const Container = styled.main`
   text-align: center;
@@ -72,7 +73,7 @@ const StyledLink = styled.a`
 export const SidePanel = () => {
   const currentUrl = useCurrentTabUrl()
   const { summary, showSummary, fetchSummaryFromStorage, speakSummary } = useGptSummary()
-  const [fontSizeLevel, setFontSizeLevel] = useState('medium')
+  const {fontSizeLevel, setFontSizeLevel} = useFontSize();
 
   return (
     <Container style={{ fontSize: fontSizeMap[fontSizeLevel] }}>
@@ -88,7 +89,7 @@ export const SidePanel = () => {
 
       {showSummary && summary && <SummaryBox title={summary.title} summary={summary.summary} />}
 
-      <FontSizeToggle currentSize={fontSizeLevel} onChange={setFontSizeLevel} />
+      <FontSizeToggle />
 
       <StyledLink
         href="https://github.com/guocaoyi/create-chrome-ext"
