@@ -1,84 +1,152 @@
 import { useState, useEffect } from 'react'
-import FontSizeToggle from '../components/FontSizeToggle';
-import './SidePanel.css'
-import { fontSizes, fontSizeMap } from '../constants/fontSizes';
+import styled from 'styled-components'
+import FontSizeToggle from '../components/FontSizeToggle'
+import { fontSizeMap } from '../constants/fontSizes'
+import { SummaryBox } from '../components/SummaryBox'
+
+const Container = styled.main`
+  text-align: center;
+  padding: 1em;
+  margin: 0 auto;
+  font-size: 1.25rem;
+  line-height: 1.6;
+`
+
+const Title = styled.h3`
+  color: #61dafb;
+  text-transform: uppercase;
+  font-size: 1.4em;
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 2rem auto;
+`
+
+const UrlText = styled.p`
+  word-break: break-all;
+  font-size: 1rem;
+`
+
+const Actions = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0;
+  gap: 1rem;
+`
+
+const Button = styled.button`
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.8em 1.5em;
+  font-size: 1em;
+  cursor: pointer;
+  width: 85%;
+  max-width: 300px;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #005999;
+  }
+
+  &:focus {
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+  }
+`
+
+const StyledLink = styled.a`
+  font-size: 0.8em;
+  margin: 0.5rem;
+  color: #cccccc;
+  text-decoration: none;
+
+  &:hover {
+    color: #61dafb;
+  }
+`
 
 export const SidePanel = () => {
-  const link = 'https://github.com/guocaoyi/create-chrome-ext'
+  const [currentUrl, setCurrentUrl] = useState('')
+  const [fontSizeLevel, setFontSizeLevel] = useState('medium')
+  const [summary, setSummary] = useState(null)
+  const [showSummary, setShowSummary] = useState(false)
 
-  const [currentUrl, setCurrentUrl] = useState('');
-
-   const fetchCurrentTabUrl = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        setCurrentUrl(tabs[0].url);
-      }
-    });
-  };
-
-  const [fontSizeLevel, setFontSizeLevel] = useState('medium');
   const fontSizeStyle = {
     fontSize: fontSizeMap[fontSizeLevel],
-  };
+  }
+
+  const fetchCurrentTabUrl = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs.length > 0) {
+        setCurrentUrl(tabs[0].url)
+      }
+    })
+  }
 
   useEffect(() => {
-    // 컴포넌트 로드시 URL 가져오기
-    fetchCurrentTabUrl();
+    fetchCurrentTabUrl()
+    chrome.tabs.onActivated.addListener(fetchCurrentTabUrl)
 
-    // 탭 전환 시 감지
-    chrome.tabs.onActivated.addListener(fetchCurrentTabUrl);
-
-    // 탭 업데이트(페이지 변경 등) 감지
     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       if (tab.active && changeInfo.url) {
-        setCurrentUrl(changeInfo.url);
+        setCurrentUrl(changeInfo.url)
       }
-    });
-    // TODO: 요약중에 탭을 바꿀경우?
+    })
 
-    // 클린업
     return () => {
-      chrome.tabs.onActivated.removeListener(fetchCurrentTabUrl);
-      chrome.tabs.onUpdated.removeListener(() => {}); // 안전한 클린업
-    };
-  }, []);
+      chrome.tabs.onActivated.removeListener(fetchCurrentTabUrl)
+      chrome.tabs.onUpdated.removeListener(() => {})
+    }
+  }, [])
 
   const handleSummarize = () => {
-    console.log(currentUrl);
-    alert('📝 요약 버튼 클릭됨!');
-    // TODO: 현재 탭의 URL을 텍스트 추출하는 곳으로 전송, 텍스트 추출하는 동안 추출 중 표시 
-  };
+    chrome.storage.local.get(['gptSummary'], (res) => {
+      console.log('[📦 sidepanel에서 받은 요약]', res.gptSummary)
+      if (res.gptSummary && typeof res.gptSummary === 'object') {
+        setSummary(res.gptSummary)
+        setShowSummary(true)
+      } else {
+        setSummary({ title: '요약 없음', summary: '요약된 정보가 없습니다.' })
+        setShowSummary(true)
+      }
+    })
+  }
 
   const handleTTS = () => {
-    alert('🔊 TTS 실행!');
-    // TODO: 요약된 텍스트를 TTS로 재생, 요약된 텍스트가 없으면 버튼 비활성화
-  };
-
-  // TODO: 글자 크기 변경 기능 추가/ 색깔 테마 변경 기능 추가 
-
+    if (summary?.summary) {
+      const utterance = new SpeechSynthesisUtterance(summary.summary)
+      speechSynthesis.speak(utterance)
+    } else {
+      alert('요약된 내용이 없습니다.')
+    }
+  }
 
   return (
-    <main style={fontSizeStyle}>
-      <h3>SidePanel Page</h3><div className="actions">
-        <button className="action-button" onClick={handleSummarize}>
-          📝 요약하기
-        </button>
-        <button className="action-button" onClick={handleTTS}>
-          🔊 TTS 실행
-        </button>
-      </div>
-      <h3>현재 탭 URL</h3>
-            <p style={{ wordBreak: 'break-all' }}>{currentUrl}</p>
-      
-      {/* 하단 글자 크기 조절 버튼 */}
-      <FontSizeToggle
-        currentSize={fontSizeLevel}
-        onChange={setFontSizeLevel}
-      />
-      <a href={link} target="_blank">
+    <Container style={fontSizeStyle}>
+      <Title>FISA Extension</Title>
+
+      <Actions>
+        <Button onClick={handleSummarize}>📝 요약하기</Button>
+        <Button onClick={handleTTS}>🔊 TTS 실행</Button>
+      </Actions>
+
+      <Title>현재 탭 URL</Title>
+      <UrlText>{currentUrl}</UrlText>
+
+      {showSummary && summary && <SummaryBox title={summary.title} summary={summary.summary} />}
+
+      <FontSizeToggle currentSize={fontSizeLevel} onChange={setFontSizeLevel} />
+
+      <StyledLink
+        href="https://github.com/guocaoyi/create-chrome-ext"
+        target="_blank"
+        rel="noreferrer"
+      >
         generated by create-chrome-ext
-      </a>
-    </main>
+      </StyledLink>
+    </Container>
   )
 }
 
