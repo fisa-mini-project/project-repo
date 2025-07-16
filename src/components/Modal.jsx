@@ -27,6 +27,7 @@ const Overlay = styled.div`
 
 // 중앙 박스 (기존 Box 디자인 응용)
 const Box = styled.div`
+position: fixed;
   background-color: #f9f9f9;
   padding: 1rem;
   border-radius: 10px;
@@ -45,14 +46,31 @@ const Body = styled.p`
   font-size: 0.95rem;
   line-height: 1.6;
 `
-export const Modal = ({ children, title, summary, onClose}) => {
+
+// const ModalBackdrop = styled.div`
+//   position: fixed;
+//   top: 0; left: 0;
+//   width: 100vw;
+//   height: 100vh;
+//   z-index: 1;
+//   backdrop-filter: blur(8px);
+// `;
+
+
+export const Modal = ({ children, title, summary, onClose }) => {
     return (
-        <Overlay  onClick={onClose}>
-        <Box>
-            <Title>{title}</Title>
-            <Body>{summary}</Body>
-            {children}
-        </Box>
-        </Overlay>
+        <>
+            {/* <div onClick={onClose} data-cy="modal-backdrop" className='fixed top-0 left-0 w-full h-full backdrop-blur-md z-1'></div> */}
+            {/* <ModalBackdrop onClick={onClose} data-cy="modal-backdrop" /> */}
+
+            <Overlay onClick={onClose}>
+                <Box>
+                    <Title>{title}</Title>
+                    <Body>{summary}</Body>
+                    {children}
+                </Box>
+            </Overlay>
+        </>
+
     )
 }

@@ -107,13 +107,13 @@ export const SidePanel = () => {
           onClose={() => setOpenModal(false)}
           title={summary.title}
           summary={summary.summary}
-        >
+        >   <FontSizeToggle />
         </Modal>,
         document.body
       )}
 
 
-      <FontSizeToggle />
+   
 
       <StyledLink
         href="https://github.com/guocaoyi/create-chrome-ext"
