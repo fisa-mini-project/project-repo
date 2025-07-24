@@ -14,8 +14,6 @@
 
 // // 쉽게 사용하도록 커스텀 훅 제공
 // export const useFontSize = () => useContext(FontSizeContext)
-'use client'
-
 import React, { createContext, useContext, useState } from 'react'
 
 export const fontSizes = ['small', 'medium', 'large', 'xlarge']

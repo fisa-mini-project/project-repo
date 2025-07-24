@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-export const useGptSummary = () => {
+export const useSummary = () => {
   const [summary, setSummary] = useState(null)
   const [openModal, setOpenModal] = useState(false)
 
