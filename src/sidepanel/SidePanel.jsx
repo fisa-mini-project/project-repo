@@ -139,29 +139,6 @@ const Button = styled.button`
   }
 `
 
-// const UrlBox = styled.div`
-//   background: ${({ theme }) => theme.card};
-//   padding: 1rem;
-//   border-radius: 12px;
-//   border: 2px solid ${({ theme }) => theme.border};
-//   position: relative;
-//   overflow: hidden;
-//   &::before {
-//     position: absolute;
-//     top: 0.75rem;
-//     right: 0.75rem;
-//     opacity: 0.5;
-//   }
-// `
-
-// const UrlText = styled.p`
-//   word-break: break-all;
-//   color: ${({ theme }) => theme.text};
-//   margin: 0;
-//   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-//   padding-right: 2rem;
-// `
-
 const UrlContainer = styled.div`
   background: ${({ theme }) =>
     theme.mode === 'highContrast'

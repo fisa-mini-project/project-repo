@@ -139,27 +139,42 @@ const Button = styled.button`
   }
 `
 
-const UrlBox = styled.div`
-  background: ${({ theme }) => theme.card};
-  padding: 1rem;
+const UrlContainer = styled.div`
+  background: ${({ theme }) =>
+    theme.mode === 'highContrast'
+      ? theme.card
+      : 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)'};
   border-radius: 12px;
   border: 2px solid ${({ theme }) => theme.border};
+  padding: 1.5rem;
+  margin-top: 1rem;
   position: relative;
-  overflow: hidden;
   &::before {
+    content: '';
     position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    opacity: 0.5;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: ${({ theme }) =>
+      theme.mode === 'highContrast'
+        ? theme.card
+        : 'linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%)'};
+    border-radius: 0.75rem 0.75rem 0 0;
   }
 `
-
 const UrlText = styled.p`
-  word-break: break-all;
   color: ${({ theme }) => theme.text};
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.95rem;
+  font-weight: 500;
+  word-break: break-all;
+  line-height: 1.6;
   margin: 0;
-  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-  padding-right: 2rem;
+  background: ${({ theme }) => (theme.mode === 'highContrast' ? theme.card : '#FFFFFF')};
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
 `
 
 const FontSizeControls = styled.div`
@@ -209,7 +224,7 @@ const HighContrastToggle = styled.button`
   border-radius: 50%;
   width: 56px;
   height: 56px;
-  font-size: 10px;
+  font-size: 32px;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
@@ -310,9 +325,9 @@ export const Popup = ({ toggleContrast, isHighContrast }) => {
           </CopyButton>
           현재 URL
         </SectionTitle>
-        <UrlBox>
-          <UrlText>{currentUrl}</UrlText>
-        </UrlBox>
+        <UrlContainer>
+          <UrlText aria-label={`현재 페이지 주소: ${currentUrl}`}>{currentUrl}</UrlText>
+        </UrlContainer>
       </Card>
       <Card>
         <SectionTitle>
@@ -330,7 +345,7 @@ export const Popup = ({ toggleContrast, isHighContrast }) => {
           ))}
         </FontSizeControls>
         <HighContrastToggle onClick={toggleContrast}>
-          {isHighContrast ? '대비모드 끄기' : '대비모드 켜기'}
+          {isHighContrast ? '🔆' : '🌙'}
         </HighContrastToggle>
       </Card>
       <Footer>
