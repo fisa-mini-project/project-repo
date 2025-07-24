@@ -112,4 +112,13 @@ $ git checkout feat/{기능명}
 - handle이벤트명 = () ⇒ {}
 - handleClick, handleSubmit, ...
 </aside>
-접기
+
+# Privacy Policy - Easy Reader Chrome Extension
+
+Easy Reader does not collect, store, or share any personally identifiable information.
+
+This extension sends selected webpage text to an external LLM API (Groq) solely for the purpose of generating a summary. No user identity or personal data is transmitted.
+
+The summary results are stored locally using chrome.storage API and never sent to any third-party services.
+
+If you have any questions, feel free to contact us at [jhcki222@gmail.com].
