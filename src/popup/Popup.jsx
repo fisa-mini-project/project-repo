@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import styled, { keyframes } from 'styled-components'
 import { fontSizeMap } from '../constants/fontSizes'
-import { SummaryBox } from '../components/SummaryBox'
 import { Modal } from '../components/Modal'
 import { createPortal } from 'react-dom'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
@@ -20,7 +19,6 @@ const pulse = keyframes`
   50% { transform: scale(1.02); }
   100% { transform: scale(1); }
 `
-
 const Container = styled.main`
   min-height: 100vh;
   background: ${({ theme }) => theme.background};
@@ -35,7 +33,6 @@ const Container = styled.main`
     color: ${({ theme }) => theme.text};
   }
 `
-
 const Card = styled.div`
   background: ${({ theme }) => theme.card};
   border: 1px solid ${({ theme }) => theme.border};
@@ -64,14 +61,18 @@ const HeaderCard = styled(Card)`
 
 const Title = styled.h1`
   color: ${({ theme }) => theme.buttonText};
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 2.2rem;
   margin-bottom: 0.5rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.1rem;
 `
 
 const Subtitle = styled.p`
   color: ${({ theme }) => theme.buttonText};
   opacity: 0.9;
+  font-size: 1.1rem;
+  font-weight: 600;
 `
 
 const SectionTitle = styled.h2`
@@ -81,6 +82,24 @@ const SectionTitle = styled.h2`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+`
+
+const CopyButton = styled.button`
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  padding: 0;
+  color: ${({ theme }) => theme.text};
+  transition: color 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.primary || '#61dafb'};
+  }
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.primary || '#61dafb'};
+    outline-offset: 2px;
+  }
 `
 
 const Actions = styled.div`
@@ -128,7 +147,6 @@ const UrlBox = styled.div`
   position: relative;
   overflow: hidden;
   &::before {
-    content: '🔗';
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
@@ -235,10 +253,6 @@ export const Popup = ({ toggleContrast, isHighContrast }) => {
   const { fontSizeLevel, setFontSizeLevel } = useFontSize()
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    setFontSizeLevel('small')
-  }, [])
-
   const handleSummary = async () => {
     setIsLoading(true)
     try {
@@ -246,6 +260,22 @@ export const Popup = ({ toggleContrast, isHighContrast }) => {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  //url 복사 함수
+  const [copied, setCopied] = useState(false)
+  const handleCopyLink = () => {
+    if (!currentUrl) return
+    navigator.clipboard
+      .writeText(currentUrl)
+      .then(() => {
+        setCopied(true)
+        alert('✅복사되었습니다✅')
+        setTimeout(() => setCopied(false), 2000) // 2초 후 복사 상태 리셋
+      })
+      .catch(() => {
+        alert('복사에 실패했습니다. 다시 시도해주세요.')
+      })
   }
 
   const fontSizeOptions = [
@@ -276,7 +306,10 @@ export const Popup = ({ toggleContrast, isHighContrast }) => {
       </Card>
       <Card>
         <SectionTitle>
-          <span>🔗</span> 현재 URL
+          <CopyButton onClick={handleCopyLink} aria-label="현재 URL 복사" type="button">
+            {copied ? '✅' : '🔗'}
+          </CopyButton>
+          현재 URL
         </SectionTitle>
         <UrlBox>
           <UrlText>{currentUrl}</UrlText>
