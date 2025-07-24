@@ -8,7 +8,6 @@ import { createPortal } from 'react-dom'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
 import { useGptSummary } from '../hooks/useGptSummary'
 import { useFontSize } from '../contexts/FontSizeContext'
-import FontSizeToggle from '../components/FontSizeToggle'
 
 // 애니메이션 정의
 const fadeIn = keyframes`
@@ -83,11 +82,13 @@ const SectionTitle = styled.h2`
   align-items: center;
   gap: 0.5rem;
 `
+
 const Actions = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
 `
+
 const Button = styled.button`
   background: ${({ theme, variant }) =>
     variant === 'primary' ? theme.buttonPrimary : theme.buttonSecondary};
@@ -301,7 +302,7 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
           <span className="icon">GitHub</span> 소스 코드 보기
         </StyledLink>
       </Footer>
-      {openModal &&
+   {openModal &&
         createPortal(
           <Modal
             onClose={() => setOpenModal(false)}
