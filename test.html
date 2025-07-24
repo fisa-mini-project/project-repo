@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Flex 비율 조정 예시</title>
+  <style>
+    .container {
+      display: flex;
+      width: 600px;
+      height: 200px;
+      border: 2px solid #333;
+    }
+
+    .box1 {
+      background-color: lightcoral;
+      flex: 0.2; /* 비율 1 */
+    }
+
+    .box2 {
+      background-color: lightblue;
+      flex: 0.6; /* 비율 2 */
+    }
+
+    .box3 {
+      background-color: lightgreen;
+      flex: 0.2; /* 비율 3 */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="box1">1</div>
+    <div class="box2">2</div>
+    <div class="box3">3</div>
+  </div>
+</body>
+</html>
