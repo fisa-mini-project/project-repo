@@ -4,7 +4,7 @@ import { fontSizeMap } from '../constants/fontSizes'
 import { Modal } from '../components/Modal'
 import { createPortal } from 'react-dom'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
-import { useGptSummary } from '../hooks/useGptSummary'
+import { useSummary } from '../hooks/useSummary'
 import { useFontSize } from '../contexts/FontSizeContext'
 import FontSizeToggle from '../components/FontSizeToggle'
 
@@ -248,8 +248,7 @@ const StyledLink = styled.a`
 
 export const Popup = ({ toggleContrast, isHighContrast }) => {
   const currentUrl = useCurrentTabUrl()
-  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } =
-    useGptSummary()
+  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } = useSummary()
   const { fontSizeLevel, setFontSizeLevel } = useFontSize()
   const [isLoading, setIsLoading] = useState(false)
 
