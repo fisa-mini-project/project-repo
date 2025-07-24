@@ -32,7 +32,7 @@ export async function requestLLMSummary(text) {
         { role: 'system', content: prompt },
         { role: 'user', content: text },
       ],
-      model: 'llama3-8b-8192',
+      model: 'compound-beta-mini',
       temperature: 0.7,
     })
 
