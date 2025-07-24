@@ -78,7 +78,7 @@
 ```// 브랜치 생성 ❗❗항상 메인에 체크아웃해서 만들것❗❗
 $ git branch feat/{기능명}
 // 브랜치 체크아웃
-$ git checkout feat/{기능명
+$ git checkout feat/{기능명}
 ```
 
 반드시 push는 feat/{기능명}에 해주시고, github에서, develop에 PR 날리기!
