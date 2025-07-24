@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
 import { useGptSummary } from '../hooks/useGptSummary'
 import { useFontSize } from '../contexts/FontSizeContext'
+import FontSizeToggle from '../components/FontSizeToggle'
 
 // 애니메이션 정의
 const fadeIn = keyframes`
@@ -259,7 +260,7 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
       </HeaderCard>
       <Card>
         <SectionTitle>
-          <span>⚡</span> 주요 기능
+          <span>🔍</span> 주요 기능
         </SectionTitle>
         <Actions>
           <Button variant="primary" onClick={handleSummary} disabled={isLoading}>
@@ -302,13 +303,14 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
           <span className="icon">GitHub</span> 소스 코드 보기
         </StyledLink>
       </Footer>
-   {openModal &&
+      {openModal &&
         createPortal(
           <Modal
             onClose={() => setOpenModal(false)}
             title={summary?.title}
             summary={summary?.summary}
-          ><FontSizeToggle></FontSizeToggle>
+          >
+            <FontSizeToggle></FontSizeToggle>
           </Modal>,
           document.body,
         )}
