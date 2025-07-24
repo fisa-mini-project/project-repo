@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
 import { useGptSummary } from '../hooks/useGptSummary'
 import { useFontSize } from '../contexts/FontSizeContext'
+import FontSizeToggle from '../components/FontSizeToggle'
 
 // 애니메이션 정의
 const fadeIn = keyframes`
@@ -64,14 +65,18 @@ const HeaderCard = styled(Card)`
 
 const Title = styled.h1`
   color: ${({ theme }) => theme.buttonText};
-  font-weight: 700;
+  font-weight: 800;
+  font-size:2.2rem;
   margin-bottom: 0.5rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.1rem;
 `
 
 const Subtitle = styled.p`
   color: ${({ theme }) => theme.buttonText};
   opacity: 0.9;
+  font-size: 1.1rem;
+  font-weight: 600;
 `
 
 const SectionTitle = styled.h2`
@@ -82,6 +87,24 @@ const SectionTitle = styled.h2`
   align-items: center;
   gap: 0.5rem;
 `
+const CopyButton = styled.button`
+ cursor: pointer;
+ background : transparent;
+ border:none;
+ font-size:1.2rem;
+ padding:0;
+ color: ${({ theme }) => theme.text};
+  transition: color 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.primary || "#61dafb"};
+  }
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.primary || "#61dafb"};
+    outline-offset: 2px;
+  }
+`
+
 
 const Actions = styled.div`
   display: flex;
@@ -128,7 +151,6 @@ const UrlBox = styled.div`
   position: relative;
   overflow: hidden;
   &::before {
-    content: '🔗';
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
@@ -244,6 +266,19 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
     }
   }
 
+  //url 복사 함수
+  const [copied, setCopied] = useState(false);
+  const handleCopyLink = () => {
+    if (!currentUrl) return
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      setCopied(true);
+      alert("✅복사되었습니다✅");
+      setTimeout(() => setCopied(false), 2000) // 2초 후 복사 상태 리셋
+    }).catch(() => {
+      alert("복사에 실패했습니다. 다시 시도해주세요.")
+    })
+  }
+
   const fontSizeOptions = [
     { key: 'small', label: '작게' },
     { key: 'medium', label: '보통' },
@@ -272,10 +307,14 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
       </Card>
       <Card>
         <SectionTitle>
-          <span>🔗</span> 현재 URL
+          
+          <CopyButton onClick={handleCopyLink} aria-label="현재 URL 복사" type="button">            
+            {copied ? "✅" : "🔗"}
+          </CopyButton>현재 URL 
         </SectionTitle>
         <UrlBox>
           <UrlText>{currentUrl}</UrlText>
+
         </UrlBox>
       </Card>
       <Card>
@@ -302,7 +341,7 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
           <span className="icon">GitHub</span> 소스 코드 보기
         </StyledLink>
       </Footer>
-   {openModal &&
+      {openModal &&
         createPortal(
           <Modal
             onClose={() => setOpenModal(false)}
