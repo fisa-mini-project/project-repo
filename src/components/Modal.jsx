@@ -145,3 +145,4 @@ export const Modal = ({ children, title, summary, onClose }) => {
     </Overlay>
   )
 }
+
