@@ -302,13 +302,14 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
           <span className="icon">GitHub</span> 소스 코드 보기
         </StyledLink>
       </Footer>
-      {openModal &&
+   {openModal &&
         createPortal(
           <Modal
             onClose={() => setOpenModal(false)}
             title={summary?.title}
             summary={summary?.summary}
-          />,
+          ><FontSizeToggle></FontSizeToggle>
+          </Modal>,
           document.body,
         )}
     </Container>
