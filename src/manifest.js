@@ -1,10 +1,8 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 import packageData from '../package.json' assert { type: 'json' }
 
-const isDev = process.env.NODE_ENV == 'development'
-
 export default defineManifest({
-  name: `${packageData.displayName || packageData.name}${isDev ? ` ➡️ Dev` : ''}`,
+  name: 'Easy Reader',
   description: packageData.description,
   version: packageData.version,
   manifest_version: 3,
