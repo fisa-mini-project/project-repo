@@ -18,12 +18,6 @@ export async function requestLLMSummary(text) {
 - key와 value는 모두 큰따옴표(")로 감싸야 해.
 - summary는 줄바꿈(\\n)을 사용하여 문장을 구분하고, 광고나 홍보 내용 없이 순수 핵심 내용만 포함해야 해.
 - 표나 리스트 형식 말고, 설명문 형태로 작성해줘.
-
-예시 형식:
-{
-  "title": "햄버거 프랜차이즈의 성장 요인",
-  "summary": "햄버거 프랜차이즈는 저렴한 가격과 빠른 서비스로 인기를 얻었다.\\n특히 10~30대 고객층의 수요가 많았다.\\n배달 인프라와 마케팅 전략도 성장에 큰 영향을 줬다.\\n트렌드에 맞춘 운영 방식이 성공 요인이 되었다."
-}
   `.trim()
 
   try {
@@ -37,13 +31,16 @@ export async function requestLLMSummary(text) {
     })
 
     const rawText = chatCompletion.choices?.[0]?.message?.content ?? '{}'
-    console.log('[📥 LLM 응답]', rawText)
+    console.log('[📥 LLM 원본 응답]', rawText)
 
-    // JSON 블록만 추출
+    // JSON 파싱
     const jsonMatch = rawText.match(/{[\s\S]*?}/)
     if (!jsonMatch) throw new Error('JSON 형식 응답을 찾을 수 없음')
 
-    return JSON.parse(jsonMatch[0])
+    const jsonResult = JSON.parse(jsonMatch[0])
+    console.log('[📥 LLM 응답 JSON]', jsonResult.title, jsonResult.summary)
+
+    return jsonResult
   } catch (err) {
     console.error('[❌ 요약 실패]', err)
     return {
