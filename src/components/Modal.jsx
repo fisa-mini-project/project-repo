@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { useFontSize, fontSizeMap } from '../contexts/FontSizeContext'
 import { X, FileText } from 'lucide-react'
+import Spinner from './Spinner'
 
 const Overlay = styled.div`
   position: fixed;
@@ -88,6 +89,7 @@ const SummaryContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 `
 
 const SummaryText = styled.p`
@@ -102,18 +104,40 @@ const SummaryText = styled.p`
 
 export const Modal = ({ children, title, summary, onClose }) => {
   const { fontSizeLevel } = useFontSize()
+  const modalRef = useRef(null)
 
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleEsc)
+
+    // 포커스 자동 이동
+    modalRef.current?.focus()
+
     return () => window.removeEventListener('keydown', handleEsc)
   }, [onClose])
+
+  const renderSummaryContent = () => {
+    if (summary === undefined || summary === null || summary === '') {
+      return (
+        <SummaryText fontSize={fontSizeMap[fontSizeLevel]}>요약된 내용이 없습니다.</SummaryText>
+      )
+    }
+    if (summary === 'loading') {
+      return <Spinner />
+    }
+    if (typeof summary === 'string') {
+      return <SummaryText fontSize={fontSizeMap[fontSizeLevel]}>{summary}</SummaryText>
+    }
+    return summary
+  }
 
   return (
     <Overlay onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <Container
+        ref={modalRef}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         style={{ fontSize: fontSizeMap[fontSizeLevel] }}
       >
@@ -125,9 +149,7 @@ export const Modal = ({ children, title, summary, onClose }) => {
           </CloseButton>
         </Header>
         <Content>
-          <SummaryContainer>
-            <SummaryText fontSize={fontSizeMap[fontSizeLevel]}>{summary}</SummaryText>
-          </SummaryContainer>
+          <SummaryContainer>{renderSummaryContent()}</SummaryContainer>
           {children}
         </Content>
       </Container>

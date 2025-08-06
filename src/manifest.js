@@ -25,7 +25,7 @@ export default defineManifest({
   content_scripts: [
     {
       matches: ['http://*/*', 'https://*/*'],
-      js: ['src/contentScript/index.js'],
+      js: ['src/contentscript/index.js'],
     },
   ],
   side_panel: {
@@ -37,8 +37,12 @@ export default defineManifest({
       matches: [],
     },
   ],
-  permissions: ['sidePanel', 'storage', 'tabs'],
-  chrome_url_overrides: {
-    newtab: 'newtab.html',
-  },
+  permissions: [
+    'sidePanel',
+    'storage',
+    'tabs',
+    'scripting', // ← scripting 권한 추가
+    'notifications',
+  ],
+  host_permissions: ['http://*/*', 'https://*/*'],
 })

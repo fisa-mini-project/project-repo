@@ -1,11 +1,12 @@
-import { useState } from 'react'
 import styled, { keyframes } from 'styled-components'
+import { createPortal } from 'react-dom'
+import { useFontSize } from '../contexts/FontSizeContext'
+import { useSummary } from '../hooks/useSummary'
 import { fontSizeMap } from '../constants/fontSizes'
 import { Modal } from '../components/Modal'
-import { createPortal } from 'react-dom'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
-import { useSummary } from '../hooks/useSummary'
-import { useFontSize } from '../contexts/FontSizeContext'
+import { useState, useEffect } from 'react'
+import Spinner from '../components/Spinner'
 import FontSizeToggle from '../components/FontSizeToggle'
 
 // 애니메이션 정의
@@ -13,12 +14,12 @@ const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 `
-
 const pulse = keyframes`
   0% { transform: scale(1); }
   50% { transform: scale(1.02); }
   100% { transform: scale(1); }
 `
+
 const Container = styled.main`
   min-height: 100vh;
   background: ${({ theme }) => theme.background};
@@ -42,7 +43,6 @@ const Card = styled.div`
   margin-bottom: 2rem;
   font-size: inherit;
 `
-
 const HeaderCard = styled(Card)`
   background: ${({ theme }) => theme.buttonPrimary};
   text-align: center;
@@ -58,7 +58,6 @@ const HeaderCard = styled(Card)`
     pointer-events: none;
   }
 `
-
 const Title = styled.h1`
   color: ${({ theme }) => theme.buttonText};
   font-weight: 800;
@@ -67,14 +66,12 @@ const Title = styled.h1`
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   letter-spacing: 0.1rem;
 `
-
 const Subtitle = styled.p`
   color: ${({ theme }) => theme.buttonText};
   opacity: 0.9;
   font-size: 1.1rem;
   font-weight: 600;
 `
-
 const SectionTitle = styled.h2`
   color: ${({ theme }) => theme.text};
   font-weight: 600;
@@ -83,7 +80,6 @@ const SectionTitle = styled.h2`
   align-items: center;
   gap: 0.5rem;
 `
-
 const CopyButton = styled.button`
   cursor: pointer;
   background: transparent;
@@ -92,7 +88,6 @@ const CopyButton = styled.button`
   padding: 0;
   color: ${({ theme }) => theme.text};
   transition: color 0.2s;
-
   &:hover {
     color: ${({ theme }) => theme.primary || '#61dafb'};
   }
@@ -101,13 +96,11 @@ const CopyButton = styled.button`
     outline-offset: 2px;
   }
 `
-
 const Actions = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
 `
-
 const Button = styled.button`
   background: ${({ theme, variant }) =>
     variant === 'primary' ? theme.buttonPrimary : theme.buttonSecondary};
@@ -138,7 +131,6 @@ const Button = styled.button`
     animation: ${pulse} 1.5s infinite;
   }
 `
-
 const UrlContainer = styled.div`
   background: ${({ theme }) =>
     theme.mode === 'highContrast'
@@ -176,14 +168,12 @@ const UrlText = styled.p`
   border-radius: 0.5rem;
   border: 1px solid #e2e8f0;
 `
-
 const FontSizeControls = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
   margin-top: 1rem;
 `
-
 const FontSizeButton = styled.button`
   background: ${({ active, theme }) => (active ? theme.buttonPrimary : theme.background)};
   color: ${({ active, theme }) => (active ? theme.buttonText : theme.text)};
@@ -195,25 +185,19 @@ const FontSizeButton = styled.button`
   transition: all 0.2s ease;
   min-height: 44px;
 
-  /* hover 시 테두리 강조 */
   &:hover {
     border-color: ${({ theme }) => theme.focusOutline};
   }
-
-  /* 키보드 포커스 시 */
   &:focus {
     outline: 3px solid ${({ theme }) => theme.focusOutline};
     outline-offset: 2px;
   }
-
-  /* 항상 active인 경우엔 box-shadow 등 시각적 강조 */
   ${({ active, theme }) =>
     active &&
     `
     box-shadow: 0 0 0 3px ${theme.focusOutline};
   `}
 `
-
 const HighContrastToggle = styled.button`
   position: fixed;
   bottom: 1rem;
@@ -237,12 +221,10 @@ const HighContrastToggle = styled.button`
     outline-offset: 2px;
   }
 `
-
 const Footer = styled.footer`
   text-align: center;
   padding: 1rem 0;
 `
-
 const StyledLink = styled.a`
   display: inline-flex;
   align-items: center;
@@ -261,43 +243,14 @@ const StyledLink = styled.a`
   }
 `
 
-export const SidePanel = ({ toggleContrast, isHighContrast }) => {
+export const SidePanel = () => {
   const currentUrl = useCurrentTabUrl()
-  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } = useSummary()
   const { fontSizeLevel, setFontSizeLevel } = useFontSize()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleSummary = async () => {
-    setIsLoading(true)
-    try {
-      await fetchSummaryFromStorage()
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  //url 복사 함수
   const [copied, setCopied] = useState(false)
-  const handleCopyLink = () => {
-    if (!currentUrl) return
-    navigator.clipboard
-      .writeText(currentUrl)
-      .then(() => {
-        setCopied(true)
-        alert('✅복사되었습니다✅')
-        setTimeout(() => setCopied(false), 2000) // 2초 후 복사 상태 리셋
-      })
-      .catch(() => {
-        alert('복사에 실패했습니다. 다시 시도해주세요.')
-      })
-  }
 
-  const fontSizeOptions = [
-    { key: 'small', label: '작게' },
-    { key: 'medium', label: '보통' },
-    { key: 'large', label: '크게' },
-    { key: 'xlarge', label: '매우 크게' },
-  ]
+  // ✅ useSummary에서 TTS까지 함께 사용
+  const { summary, isLoading, openModal, setOpenModal, requestSummary, speakSummary } =
+    useSummary(currentUrl)
 
   return (
     <Container style={{ fontSize: fontSizeMap[fontSizeLevel] }}>
@@ -305,62 +258,87 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
         <Title>Easy Reader</Title>
         <Subtitle>웹 페이지 요약 및 음성 변환 도구</Subtitle>
       </HeaderCard>
+
       <Card>
-        <SectionTitle>
-          <span>🔍</span> 주요 기능
-        </SectionTitle>
+        <SectionTitle>🔍 주요 기능</SectionTitle>
         <Actions>
-          <Button variant="primary" onClick={handleSummary} disabled={isLoading}>
-            <span className="icon">📝</span> 요약 가져오기
+          <Button variant="primary" onClick={requestSummary} disabled={isLoading}>
+            {isLoading ? <Spinner /> : '📝 페이지 요약하기'}
           </Button>
-          <Button variant="secondary" onClick={speakSummary}>
-            <span className="icon">📢</span> 요약 읽기
+          <Button
+            variant="secondary"
+            onClick={() => setOpenModal(true)}
+            disabled={!summary?.summary}
+          >
+            📄 페이지 요약 보기
+          </Button>
+          <Button variant="secondary" onClick={speakSummary} disabled={!summary?.summary}>
+            📢 요약 읽기
           </Button>
         </Actions>
       </Card>
+
+      {/* URL 복사 */}
       <Card>
         <SectionTitle>
-          <CopyButton onClick={handleCopyLink} aria-label="현재 URL 복사" type="button">
+          <CopyButton
+            onClick={() => {
+              navigator.clipboard.writeText(currentUrl).then(() => {
+                setCopied(true)
+                alert('✅ 복사되었습니다 ✅')
+                setTimeout(() => setCopied(false), 2000)
+              })
+            }}
+          >
             {copied ? '✅' : '🔗'}
           </CopyButton>
           현재 URL
         </SectionTitle>
         <UrlContainer>
-          <UrlText aria-label={`현재 페이지 주소: ${currentUrl}`}>{currentUrl}</UrlText>
+          <UrlText>{currentUrl}</UrlText>
         </UrlContainer>
       </Card>
+
+      {/* 글자 크기 */}
       <Card>
-        <SectionTitle>
-          <span>⚙️</span> 글자 크기
-        </SectionTitle>
+        <SectionTitle>⚙️ 글자 크기</SectionTitle>
         <FontSizeControls>
-          {fontSizeOptions.map((option) => (
+          {['small', 'medium', 'large', 'xlarge'].map((option) => (
             <FontSizeButton
-              key={option.key}
-              active={fontSizeLevel === option.key}
-              onClick={() => setFontSizeLevel(option.key)}
+              key={option}
+              active={fontSizeLevel === option}
+              onClick={() => setFontSizeLevel(option)}
             >
-              {option.label}
+              {option === 'small'
+                ? '작게'
+                : option === 'medium'
+                  ? '보통'
+                  : option === 'large'
+                    ? '크게'
+                    : '매우 크게'}
             </FontSizeButton>
           ))}
         </FontSizeControls>
-        <HighContrastToggle onClick={toggleContrast}>
-          {isHighContrast ? '🔆' : '🌙'}
-        </HighContrastToggle>
       </Card>
-      <Footer>
-        <StyledLink href="https://github.com/fisa-mini-project/project-repo" target="_blank">
-          <span className="icon">GitHub</span> 소스 코드 보기
-        </StyledLink>
-      </Footer>
+
+      <footer style={{ textAlign: 'center', padding: '1rem 0' }}>
+        <a
+          href="https://github.com/fisa-mini-project/project-repo"
+          target="_blank"
+          rel="noreferrer"
+        >
+          GitHub 소스 코드 보기
+        </a>
+      </footer>
+
       {openModal &&
         createPortal(
           <Modal
             onClose={() => setOpenModal(false)}
-            title={summary?.title}
-            summary={summary?.summary}
+            title={summary?.title || (isLoading ? '요약 중...' : '요약 결과')}
+            summary={isLoading ? <Spinner /> : summary?.summary || '내용이 없습니다.'}
           >
-            <FontSizeToggle></FontSizeToggle>
+            <FontSizeToggle />
           </Modal>,
           document.body,
         )}
