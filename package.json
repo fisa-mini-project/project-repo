@@ -1,9 +1,9 @@
 {
   "name": "fisa-extension",
   "displayName": "Easy Reader",
-  "version": "1.0",
+  "version": "1.1",
   "author": "**",
-  "description": "[우리 FIS아카데미 5기 클라우드 서비스 개발 미니 프로젝트] Google Chrome Extension 개발",
+  "description": "웹 페이지 요약 및 음성 출력 확장 프로그램입니다.",
   "type": "module",
   "license": "MIT",
   "keywords": [
