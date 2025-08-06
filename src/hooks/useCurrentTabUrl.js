@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export const useCurrentTabUrl = (maxPathLength = 30) => {
+export const useCurrentTabUrl = (maxPathLength = 3000) => {
   const [currentUrl, setCurrentUrl] = useState('')
 
   useEffect(() => {
