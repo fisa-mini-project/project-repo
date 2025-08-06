@@ -1,24 +1,22 @@
-import React from "react"
-import styled from "styled-components"
-import { useFontSize, fontSizes } from "../contexts/FontSizeContext"
-import { Type, Plus, Minus } from "lucide-react"  // 아이콘 라이브러리 사용시 import
+import React from 'react'
+import styled, { useTheme } from 'styled-components'
+import { useFontSize, fontSizes } from '../contexts/FontSizeContext'
+import { Type, Plus, Minus } from 'lucide-react'
 
-// 각 font size 별 한글 라벨
 const fontSizeLabels = {
-  small: "작게",
-  medium: "보통",
-  large: "크게",
-  xlarge: "매우 크게",
+  small: '작게',
+  medium: '보통',
+  large: '크게',
+  xlarge: '매우 크게',
 }
 
-// styled-components 스타일 정의
 const Card = styled.div`
-  background: #fff;
-  border: 2px solid #e5e7eb;
+  background: ${({ theme }) => theme.card};
+  border: 2px solid ${({ theme }) => theme.border};
   border-radius: 1rem;
   padding: 0.7rem;
-  box-shadow: 0 2px 12px 0 rgba(100,116,139,0.10);
-  flex:none;
+  box-shadow: 0 2px 12px 0 rgba(100, 116, 139, 0.1);
+  flex: none;
   font-size: 1rem;
 `
 
@@ -31,50 +29,55 @@ const Header = styled.div`
 
 const Title = styled.h3`
   font-weight: 600;
-  color: #1e293b;
+  color: ${({ theme }) => theme.text};
   font-size: 0.95rem;
-  margin:0;
+  margin: 0;
 `
 
 const ButtonGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-   width: 100%; heigth:2rem;
+  width: 100%;
+  height: 2rem;
 `
 
 const RoundButton = styled.button`
-  flex : 0.2;
-  width: 2rem; height: 2rem;
-  background: ${({ disabled }) => disabled ? "#f1f5f9" : "#f3f4f6"};
-  color: ${({ disabled }) => disabled ? "#a0aec0" : "#334155"};
+  flex: 0.2;
+  width: 2rem;
+  height: 2rem;
+  background: ${({ disabled, theme }) => (disabled ? theme.border : '#f3f4f6')};
+  color: ${({ disabled, theme }) => (disabled ? '#a0aec0' : '#334155')};
   border: none;
   border-radius: 0.5rem;
   transition: background 0.15s;
   font-size: 0.9rem;
-  cursor: ${({ disabled }) => disabled ? "not-allowed" : "pointer"};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+
   &:hover {
-    background: ${({ disabled }) => disabled ? "#f1f5f9" : "#e5e7eb"};
+    background: ${({ disabled, theme }) => (disabled ? theme.border : '#e5e7eb')};
   }
+
   &:focus {
-    outline: 2px solid #2563eb;
+    outline: 2px solid ${({ theme }) => theme.focusOutline};
     outline-offset: 1px;
   }
 `
 
 const SizeDisplay = styled.div`
-flex:0.7;
-heigth:2rem;
+  flex: 0.7;
+  height: 2rem;
   .badge {
-    background: linear-gradient(90deg, #dbeafe 0%, #ede9fe 100%);
-    width: 100%; 
-    display: block; 
-    text-align: center;    
+    background: ${({ theme }) =>
+      theme.mode === 'highContrast' ? '#333' : 'linear-gradient(90deg, #dbeafe 0%, #ede9fe 100%)'};
+    width: 100%;
+    display: block;
+    text-align: center;
     border-radius: 0.38rem;
-    heigth:2rem;
+    height: 2rem;
     font-weight: 500;
-    color: #334155;
-    font-size: 1rem
+    color: ${({ theme }) => theme.text};
+    font-size: 1rem;
   }
 `
 
@@ -84,16 +87,18 @@ const Indicators = styled.div`
   margin-top: 0.65rem;
   justify-content: center;
 `
+
 const Dot = styled.div`
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background: ${({ active }) => active ? "#2563eb" : "#e5e7eb"};
+  background: ${({ active, theme }) => (active ? theme.focusOutline : theme.border)};
   transition: background 0.15s;
 `
 
 export const FontSizeToggle = () => {
   const { fontSizeLevel, setFontSizeLevel } = useFontSize()
+  const theme = useTheme()
   const currentIndex = fontSizes.indexOf(fontSizeLevel)
   const maxIndex = fontSizes.length - 1
 
@@ -107,7 +112,7 @@ export const FontSizeToggle = () => {
   return (
     <Card>
       <Header>
-        <Type size={20} color="#2563eb" />
+        <Type size={20} color={theme.focusOutline} />
         <Title>글자 크기 조절</Title>
       </Header>
       <ButtonGroup>
@@ -139,4 +144,3 @@ export const FontSizeToggle = () => {
 }
 
 export default FontSizeToggle
-

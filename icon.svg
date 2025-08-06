@@ -1,0 +1,17 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 문서(요약·읽기) -->
+  <rect x="16" y="24" width="62" height="48" rx="10" fill="#F5F9FF" stroke="#2563EB" stroke-width="4"/>
+  <rect x="26" y="38" width="42" height="7" rx="3.5" fill="#3B82F6"/>
+  <rect x="26" y="52" width="30" height="6" rx="3" fill="#60A5FA"/>
+  <rect x="26" y="64" width="17" height="5" rx="2.5" fill="#93C5FD"/>
+  <!-- 스피커(음성) -->
+  <g>
+    <rect x="84" y="46" width="16" height="32" rx="6" fill="#2563EB"/>
+    <polygon points="84,62 70,54 70,70 84,70" fill="#60A5FA"/>
+    <!-- 소리선/음파 -->
+    <path d="M106 60 Q118 68 106 76" stroke="#3B82F6" stroke-width="4" fill="none"/>
+    <path d="M110 58 Q128 68 110 78" stroke="#60A5FA" stroke-width="2.2" fill="none"/>
+  </g>
+  <!-- 외곽 강조 (접근성 의미) -->
+  <circle cx="64" cy="64" r="60" stroke="#2563EB" stroke-width="2.5" opacity="0.09"/>
+</svg>

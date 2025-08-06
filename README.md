@@ -78,7 +78,7 @@
 ```// 브랜치 생성 ❗❗항상 메인에 체크아웃해서 만들것❗❗
 $ git branch feat/{기능명}
 // 브랜치 체크아웃
-$ git checkout feat/{기능명
+$ git checkout feat/{기능명}
 ```
 
 반드시 push는 feat/{기능명}에 해주시고, github에서, develop에 PR 날리기!
@@ -112,4 +112,13 @@ $ git checkout feat/{기능명
 - handle이벤트명 = () ⇒ {}
 - handleClick, handleSubmit, ...
 </aside>
-접기
+
+# Privacy Policy - Easy Reader Chrome Extension
+
+Easy Reader does not collect, store, or share any personally identifiable information.
+
+This extension sends selected webpage text to an external LLM API (Groq) solely for the purpose of generating a summary. No user identity or personal data is transmitted.
+
+The summary results are stored locally using chrome.storage API and never sent to any third-party services.
+
+If you have any questions, feel free to contact us at [jhcki222@gmail.com].

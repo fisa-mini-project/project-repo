@@ -1,12 +1,10 @@
-// SidePanel.jsx 리팩터링 버전
 import { useState } from 'react'
 import styled, { keyframes } from 'styled-components'
 import { fontSizeMap } from '../constants/fontSizes'
-import { SummaryBox } from '../components/SummaryBox'
 import { Modal } from '../components/Modal'
 import { createPortal } from 'react-dom'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
-import { useGptSummary } from '../hooks/useGptSummary'
+import { useSummary } from '../hooks/useSummary'
 import { useFontSize } from '../contexts/FontSizeContext'
 import FontSizeToggle from '../components/FontSizeToggle'
 
@@ -21,7 +19,6 @@ const pulse = keyframes`
   50% { transform: scale(1.02); }
   100% { transform: scale(1); }
 `
-
 const Container = styled.main`
   min-height: 100vh;
   background: ${({ theme }) => theme.background};
@@ -36,7 +33,6 @@ const Container = styled.main`
     color: ${({ theme }) => theme.text};
   }
 `
-
 const Card = styled.div`
   background: ${({ theme }) => theme.card};
   border: 1px solid ${({ theme }) => theme.border};
@@ -66,7 +62,7 @@ const HeaderCard = styled(Card)`
 const Title = styled.h1`
   color: ${({ theme }) => theme.buttonText};
   font-weight: 800;
-  font-size:2.2rem;
+  font-size: 2.2rem;
   margin-bottom: 0.5rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   letter-spacing: 0.1rem;
@@ -87,24 +83,24 @@ const SectionTitle = styled.h2`
   align-items: center;
   gap: 0.5rem;
 `
+
 const CopyButton = styled.button`
- cursor: pointer;
- background : transparent;
- border:none;
- font-size:1.2rem;
- padding:0;
- color: ${({ theme }) => theme.text};
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  padding: 0;
+  color: ${({ theme }) => theme.text};
   transition: color 0.2s;
 
   &:hover {
-    color: ${({ theme }) => theme.primary || "#61dafb"};
+    color: ${({ theme }) => theme.primary || '#61dafb'};
   }
   &:focus {
-    outline: 2px solid ${({ theme }) => theme.primary || "#61dafb"};
+    outline: 2px solid ${({ theme }) => theme.primary || '#61dafb'};
     outline-offset: 2px;
   }
 `
-
 
 const Actions = styled.div`
   display: flex;
@@ -143,41 +139,16 @@ const Button = styled.button`
   }
 `
 
-// const UrlBox = styled.div`
-//   background: ${({ theme }) => theme.card};
-//   padding: 1rem;
-//   border-radius: 12px;
-//   border: 2px solid ${({ theme }) => theme.border};
-//   position: relative;
-//   overflow: hidden;
-//   &::before {
-//     position: absolute;
-//     top: 0.75rem;
-//     right: 0.75rem;
-//     opacity: 0.5;
-//   }
-// `
-
-// const UrlText = styled.p`
-//   word-break: break-all;
-//   color: ${({ theme }) => theme.text};
-//   margin: 0;
-//   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-//   padding-right: 2rem;
-// `
-
-
 const UrlContainer = styled.div`
-background: ${({ theme }) =>
+  background: ${({ theme }) =>
     theme.mode === 'highContrast'
       ? theme.card
-      : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)'};
+      : 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)'};
   border-radius: 12px;
   border: 2px solid ${({ theme }) => theme.border};
   padding: 1.5rem;
   margin-top: 1rem;
   position: relative;
-  
   &::before {
     content: '';
     position: absolute;
@@ -188,11 +159,10 @@ background: ${({ theme }) =>
     background: ${({ theme }) =>
       theme.mode === 'highContrast'
         ? theme.card
-        : 'linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%)'};
+        : 'linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%)'};
     border-radius: 0.75rem 0.75rem 0 0;
   }
 `
-
 const UrlText = styled.p`
   color: ${({ theme }) => theme.text};
   font-family: 'Monaco', 'Menlo', monospace;
@@ -201,8 +171,7 @@ const UrlText = styled.p`
   word-break: break-all;
   line-height: 1.6;
   margin: 0;
-  background: ${({ theme }) =>
-    theme.mode === 'highContrast' ? theme.card : '#ffffff'};
+  background: ${({ theme }) => (theme.mode === 'highContrast' ? theme.card : '#FFFFFF')};
   padding: 1rem;
   border-radius: 0.5rem;
   border: 1px solid #e2e8f0;
@@ -253,9 +222,9 @@ const HighContrastToggle = styled.button`
   color: ${({ theme }) => theme.text};
   border: none;
   border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  font-size: 30px;
+  width: 56px;
+  height: 56px;
+  font-size: 32px;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
@@ -294,8 +263,7 @@ const StyledLink = styled.a`
 
 export const SidePanel = ({ toggleContrast, isHighContrast }) => {
   const currentUrl = useCurrentTabUrl()
-  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } =
-    useGptSummary()
+  const { summary, openModal, setOpenModal, fetchSummaryFromStorage, speakSummary } = useSummary()
   const { fontSizeLevel, setFontSizeLevel } = useFontSize()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -309,16 +277,19 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
   }
 
   //url 복사 함수
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false)
   const handleCopyLink = () => {
     if (!currentUrl) return
-    navigator.clipboard.writeText(currentUrl).then(() => {
-      setCopied(true);
-      alert("✅복사되었습니다✅");
-      setTimeout(() => setCopied(false), 2000) // 2초 후 복사 상태 리셋
-    }).catch(() => {
-      alert("복사에 실패했습니다. 다시 시도해주세요.")
-    })
+    navigator.clipboard
+      .writeText(currentUrl)
+      .then(() => {
+        setCopied(true)
+        alert('✅복사되었습니다✅')
+        setTimeout(() => setCopied(false), 2000) // 2초 후 복사 상태 리셋
+      })
+      .catch(() => {
+        alert('복사에 실패했습니다. 다시 시도해주세요.')
+      })
   }
 
   const fontSizeOptions = [
@@ -336,7 +307,7 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
       </HeaderCard>
       <Card>
         <SectionTitle>
-          <span>⚡</span> 주요 기능
+          <span>🔍</span> 주요 기능
         </SectionTitle>
         <Actions>
           <Button variant="primary" onClick={handleSummary} disabled={isLoading}>
@@ -349,18 +320,14 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
       </Card>
       <Card>
         <SectionTitle>
-          <CopyButton onClick={handleCopyLink} aria-label="현재 URL 복사" type="button">            
-            {copied ? "✅" : "🔗"}
-          </CopyButton>현재 URL 
+          <CopyButton onClick={handleCopyLink} aria-label="현재 URL 복사" type="button">
+            {copied ? '✅' : '🔗'}
+          </CopyButton>
+          현재 URL
         </SectionTitle>
         <UrlContainer>
           <UrlText aria-label={`현재 페이지 주소: ${currentUrl}`}>{currentUrl}</UrlText>
         </UrlContainer>
-
-        {/* <UrlBox>
-          <UrlText>{currentUrl}</UrlText>
-
-        </UrlBox> */}
       </Card>
       <Card>
         <SectionTitle>
@@ -392,7 +359,8 @@ export const SidePanel = ({ toggleContrast, isHighContrast }) => {
             onClose={() => setOpenModal(false)}
             title={summary?.title}
             summary={summary?.summary}
-          ><FontSizeToggle></FontSizeToggle>
+          >
+            <FontSizeToggle></FontSizeToggle>
           </Modal>,
           document.body,
         )}
