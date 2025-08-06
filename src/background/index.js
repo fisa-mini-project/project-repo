@@ -1,20 +1,5 @@
 import { requestLLMSummary } from './requestLLMSummary.js'
 
-// ✅ 설치 또는 업데이트 시 기존 탭에도 content-script 주입
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.tabs.query({}, (tabs) => {
-    for (const tab of tabs) {
-      if (!tab.id || !tab.url?.startsWith('http')) continue
-      chrome.scripting
-        .executeScript({
-          target: { tabId: tab.id },
-          files: ['src/contentscript/index.js'],
-        })
-        .catch((err) => console.warn('Content script 주입 실패:', err))
-    }
-  })
-})
-
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'GET_SUMMARY') {
     ;(async () => {
@@ -43,6 +28,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
               message: '페이지 요약이 완료되었습니다!',
             })
 
+            // ✅ 여기서 반드시 응답
             sendResponse(summaryResult)
           } catch (err) {
             console.error('[❌ 요약 요청 오류]', err)
