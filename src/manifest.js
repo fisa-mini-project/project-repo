@@ -26,6 +26,8 @@ export default defineManifest({
     {
       matches: ['http://*/*', 'https://*/*'],
       js: ['src/contentScript/index.js'],
+      type: 'module',
+
     },
   ],
   side_panel: {
@@ -33,12 +35,17 @@ export default defineManifest({
   },
   web_accessible_resources: [
     {
-      resources: ['img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png'],
+      resources: ['lib/readability.js','img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png'],
       matches: [],
+      type:'module'
     },
   ],
-  permissions: ['sidePanel', 'storage', 'tabs'],
-  chrome_url_overrides: {
-    newtab: 'newtab.html',
-  },
+  permissions: [
+    'sidePanel',
+    'storage',
+    'tabs',
+    'scripting', // ← scripting 권한 추가
+    'notifications',
+  ],
+  host_permissions: ['http://*/*', 'https://*/*'],
 })
