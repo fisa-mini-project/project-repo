@@ -16,6 +16,9 @@
     "node": ">=14.18.0"
   },
   "scripts": {
+    "test": "node --test src/background/llmClient.test.js",
+    "test:ui": "npm run build && playwright test",
+    "test:extension": "npm run build && node tests/native-extension.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -33,7 +36,9 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@crxjs/vite-plugin": "^2.0.0-beta.26",
+    "@playwright/test": "^1.64.1",
     "@types/chrome": "^0.1.1",
     "@types/react": "^18.2.28",
     "@types/react-dom": "^18.2.13",

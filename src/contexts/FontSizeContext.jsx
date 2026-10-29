@@ -1,18 +1,23 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext } from 'react'
+import { usePreference } from '../hooks/usePreference'
 
 export const fontSizes = ['small', 'medium', 'large', 'xlarge']
 
 export const fontSizeMap = {
-  small: '0.875rem',
-  medium: '1rem',
-  large: '1.25rem',
-  xlarge: '1.5rem',
+  small: '1rem',
+  medium: '1.125rem',
+  large: '1.5rem',
+  xlarge: '2rem',
 }
 
 const FontSizeContext = createContext()
 
 export const FontSizeProvider = ({ children }) => {
-  const [fontSizeLevel, setFontSizeLevel] = useState('medium')
+  const [fontSizeLevel, setFontSizeLevel] = usePreference(
+    'easy-reader-font-size',
+    'medium',
+    fontSizes,
+  )
 
   return (
     <FontSizeContext.Provider value={{ fontSizeLevel, setFontSizeLevel }}>

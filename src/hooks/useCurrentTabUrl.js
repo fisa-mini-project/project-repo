@@ -1,21 +1,13 @@
 import { useEffect, useState } from 'react'
 
-export const useCurrentTabUrl = (maxPathLength = 3000) => {
+export const useCurrentTabUrl = () => {
   const [currentUrl, setCurrentUrl] = useState('')
 
   useEffect(() => {
     const fetchUrl = () => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs.length > 0) {
-          try {
-            const fullUrl = tabs[0].url
-            const { origin, pathname } = new URL(fullUrl)
-            const trimmedPath =
-              pathname.length > maxPathLength ? pathname.slice(0, maxPathLength) + '…' : pathname
-            setCurrentUrl(`${origin}${trimmedPath}`)
-          } catch (err) {
-            setCurrentUrl(tabs[0].url) // fallback
-          }
+          setCurrentUrl(tabs[0].url || '')
         }
       })
     }
@@ -23,17 +15,18 @@ export const useCurrentTabUrl = (maxPathLength = 3000) => {
     fetchUrl()
 
     chrome.tabs.onActivated.addListener(fetchUrl)
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    const handleUpdated = (tabId, changeInfo, tab) => {
       if (tab.active && changeInfo.url) {
         fetchUrl()
       }
-    })
+    }
+    chrome.tabs.onUpdated.addListener(handleUpdated)
 
     return () => {
       chrome.tabs.onActivated.removeListener(fetchUrl)
-      chrome.tabs.onUpdated.removeListener(() => {})
+      chrome.tabs.onUpdated.removeListener(handleUpdated)
     }
-  }, [maxPathLength])
+  }, [])
 
   return currentUrl
 }

@@ -1,0 +1,45 @@
+/* Adapted from the supplied Meta commerce design reference.
+   Unspecified color values are local accessible choices, not official Meta values. */
+.reader {
+  --surface: #ffffff;
+  --surface-soft: #f4f5f6;
+  --text: #0a1317;
+  --muted: #505b62;
+  --accent: #0064e0;
+  --accent-hover: #0457cb;
+  --on-accent: #ffffff;
+  --line: #dde2e5;
+  --control-line: #7c878e;
+  --focus: #0143b5;
+  --selected: #edf4ff;
+  --selected-fill: #0064e0;
+  --selected-text: #ffffff;
+  --error: #9f2029;
+  --error-bg: #fff1f2;
+  --disabled-bg: #eef0f2;
+  --disabled-text: #59636b;
+  --skeleton: #dce1e5;
+  --radius-control: 100px;
+  --radius-surface: 24px;
+}
+.reader[data-contrast='high'] {
+  color-scheme: dark;
+  --surface: #101318;
+  --surface-soft: #202730;
+  --text: #ffffff;
+  --muted: #e0e5ec;
+  --accent: #ffe167;
+  --accent-hover: #ffec9e;
+  --on-accent: #111111;
+  --line: #a8b3c2;
+  --control-line: #c2cbd7;
+  --focus: #ffe167;
+  --selected: #303947;
+  --selected-fill: #ffe167;
+  --selected-text: #111111;
+  --error: #ffb8bd;
+  --error-bg: #30181c;
+  --disabled-bg: #2b323c;
+  --disabled-text: #cad1dc;
+  --skeleton: #46505e;
+}
