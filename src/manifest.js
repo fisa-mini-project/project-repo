@@ -27,7 +27,6 @@ export default defineManifest({
       matches: ['http://*/*', 'https://*/*'],
       js: ['src/contentScript/index.js'],
       type: 'module',
-
     },
   ],
   side_panel: {
@@ -35,9 +34,15 @@ export default defineManifest({
   },
   web_accessible_resources: [
     {
-      resources: ['lib/readability.js','img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png'],
+      resources: [
+        'lib/readability.js',
+        'img/logo-16.png',
+        'img/logo-32.png',
+        'img/logo-48.png',
+        'img/logo-128.png',
+      ],
       matches: [],
-      type:'module'
+      type: 'module',
     },
   ],
   permissions: [
