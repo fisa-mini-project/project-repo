@@ -20,42 +20,26 @@
 
 ## 설치하기
 
-현재 구성은 **개인 API 키를 사용하는 로컬 테스트용**입니다. Chrome과 Node.js/npm, 사용할 AI 제공자의 API 키가 필요합니다. 빌드 검증에 사용한 Node.js 버전은 24.18.0입니다.
+Chrome과 Node.js 22 이상이 필요합니다. 확장프로그램 프로젝트는 저장소 루트에 있고, 요약 서버는 `server/`에 있습니다.
 
-### 1. 프로젝트 준비
+### 1. 로컬 요약 서버 실행
 
-```bash
-git clone https://github.com/fisa-mini-project/project-repo.git
-cd project-repo
-npm ci
-```
-
-### 2. 환경변수 설정
-
-프로젝트 루트의 `.env.example`을 `.env.local`로 복사합니다. PowerShell에서는 다음 명령을 사용할 수 있습니다.
+저장소 루트에서 아래 명령을 실행하고 터미널을 열어 둡니다. 첨부 환경변수 파일을 서버 프로세스에서 직접 읽습니다. 기본 순서는 Groq → NVIDIA → Ollama Cloud입니다. 키가 설정된 제공자만 시도하고, 호출 오류나 응답 검증 실패 시 다음 제공자로 넘어갑니다. `LLM_PROVIDER_ORDER`로 순서를, `GROQ_MODEL`, `NVIDIA_MODEL`, `OLLAMA_MODEL`로 각 모델을 지정합니다. 세 키를 모두 설정하면 시도당 제한 시간은 8초입니다.
 
 ```powershell
-Copy-Item .env.example .env.local
+cd server
+node --env-file=C:/Users/SSAFY/Downloads/env index.mjs
 ```
 
-`.env.local`에서 사용할 제공자와 해당 API 키를 설정합니다. 아래 키 값은 예시입니다.
+기본 주소는 `http://localhost:3001`이며 `GET /health`로 서버 실행 여부를 확인할 수 있습니다.
 
-```dotenv
-VITE_LLM_PROVIDER=groq
-VITE_GROQ_MODEL=openai/gpt-oss-120b
-VITE_GROQ_API_KEY=your_groq_api_key
+### 2. 확장프로그램 준비
 
-VITE_OLLAMA_MODEL=gpt-oss:120b
-VITE_OLLAMA_API_KEY=your_ollama_api_key
-```
+별도 터미널의 저장소 루트에서 `npm ci`를 실행합니다. 로컬 테스트는 기본 서버 주소를 사용합니다.
 
-| 제공자 | 선택 값 | 코드의 기본 모델 | 요청 대상 |
-| --- | --- | --- | --- |
-| Groq | `groq` | `openai/gpt-oss-120b` | `api.groq.com` |
-| Ollama Cloud | `ollama` | `gpt-oss:120b` | `ollama.com` |
+Chrome 웹 스토어에 제출할 빌드는 루트의 `.env.local`에 `VITE_SUMMARY_SERVER_URL=https://your-server.example`을 설정한 다음 `npm run zip`으로 만듭니다. `package/Easy-Reader-1.3.zip`에 확장프로그램 빌드만 담깁니다.
 
-Ollama Cloud를 사용하려면 `VITE_LLM_PROVIDER=ollama`로 변경합니다. **로컬 Ollama 서버를 호출하는 설정이 아니며**, Ollama 설치나 모델 다운로드는 필요하지 않습니다. 
-
+호스팅 서비스에서 서버 프로젝트 폴더를 고를 때는 `server/`를 선택하고 시작 명령은 `npm start`로 설정합니다. 호스팅 환경변수에서 `BIND_HOST=0.0.0.0`, `GROQ_API_KEY`, `NVIDIA_API_KEY`, `OLLAMA_API_KEY`를 설정합니다. `PORT`는 호스팅 서비스가 제공하는 값을 사용합니다. 공개 배포 전에 요약 API에 인증과 호출량 제한을 적용해야 합니다.
 
 ### 3. 빌드 및 Chrome에 로드
 
@@ -105,7 +89,7 @@ npm run build
 | `node tests/evaluate-summary.mjs` | 실제 API로 합성 문서의 주요 조건 보존 여부 점검 |
 | `npm run zip` | 빌드 후 `package/`에 ZIP 생성 |
 
-브라우저 테스트는 현재 Microsoft Edge의 Chromium 엔진을 사용하므로 Edge가 설치되어 있어야 합니다. 단위·UI·호스트 테스트는 실제 AI API를 호출하지 않습니다. `evaluate-summary.mjs`는 `.env.local`의 제공자로 합성 문서를 전송하므로 API 사용량이 발생합니다. 결과는 Git에서 제외된 `test-results/`에 저장됩니다.
+브라우저 테스트는 현재 Microsoft Edge의 Chromium 엔진을 사용하므로 Edge가 설치되어 있어야 합니다. 단위·UI·호스트 테스트는 실제 AI API를 호출하지 않습니다. `evaluate-summary.mjs`는 설정된 요약 서버를 통해 합성 문서를 전송하므로 API 사용량이 발생합니다. 결과는 Git에서 제외된 `test-results/`에 저장됩니다.
 
 ## 프로젝트 구성
 
@@ -123,7 +107,7 @@ tests/              # 브라우저·확장 호스트·실제 API 평가
 docs/               # 설계 및 요약 품질 개선 기록
 ```
 
-React 18, Vite, CRXJS, Mozilla Readability, Web Speech API를 사용합니다. AI 요청은 백그라운드 서비스 워커에서 Groq 또는 Ollama Cloud로 전송합니다.
+React 18, Vite, CRXJS, Mozilla Readability, Web Speech API를 사용합니다. 백그라운드 서비스 워커는 요약 서버에 요청하고, 서버가 Groq, NVIDIA, Ollama Cloud 중 설정된 제공자를 호출합니다.
 
 - [디자인 적용 기준](DESIGN.md)
 - [요약 품질 개선 조사 및 검증](docs/summary-quality.md)
@@ -132,7 +116,7 @@ React 18, Vite, CRXJS, Mozilla Readability, Web Speech API를 사용합니다. A
 
 Easy Reader does not collect, store, or share any personally identifiable information.
 
-This extension sends selected webpage text to an external LLM API (Groq) solely for the purpose of generating a summary. No user identity or personal data is transmitted.
+This extension sends selected webpage text to an summary server and its configured LLM provider solely for the purpose of generating a summary. No user identity or personal data is transmitted.
 
 The summary results are stored locally using chrome.storage API and never sent to any third-party services.
 

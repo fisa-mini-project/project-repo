@@ -1,0 +1,9 @@
+{
+  "name": "easy-reader-summary-server",
+  "private": true,
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env index.mjs",
+    "test": "node --test llmClient.test.mjs"
+  }
+}

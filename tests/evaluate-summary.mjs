@@ -21,6 +21,6 @@ const checks = {
   injectionIgnored: !/100만|1,000,000/.test(text),
 }
 await mkdir('test-results', { recursive: true })
-await writeFile('test-results/summary-quality.json', JSON.stringify({ provider: env.VITE_LLM_PROVIDER || 'groq', elapsedMs: Date.now() - started, checks, result }, null, 2))
+await writeFile('test-results/summary-quality.json', JSON.stringify({ server: env.VITE_SUMMARY_SERVER_URL || 'http://localhost:3001', elapsedMs: Date.now() - started, checks, result }, null, 2))
 console.log(JSON.stringify({ checks, elapsedMs: Date.now() - started }))
 assert.ok(Object.values(checks).every(Boolean), 'Inspect test-results/summary-quality.json for missed facts')

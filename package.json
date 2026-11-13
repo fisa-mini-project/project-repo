@@ -16,7 +16,7 @@
     "node": ">=14.18.0"
   },
   "scripts": {
-    "test": "node --test src/background/llmClient.test.js",
+    "test": "node --test server/llmClient.test.mjs",
     "test:ui": "npm run build && playwright test",
     "test:extension": "npm run build && node tests/native-extension.mjs",
     "dev": "vite",
