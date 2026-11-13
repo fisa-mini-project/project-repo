@@ -1,7 +1,7 @@
 import { requestLLMSummary } from './requestLLMSummary.js';
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === 'GET_SUMMARY') {
+  if (['GET_SUMMARY', 'GET_TRANSLATION'].includes(msg.type)) {
     (async () => {
       try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -39,7 +39,14 @@ const pageText = await new Promise((resolve, reject) => {
   });
 });
         // 요약 요청
-        const summaryResult = await requestLLMSummary(pageText);
+        const summaryResult = await requestLLMSummary(pageText, {
+          language: msg.language,
+          translate: msg.type === 'GET_TRANSLATION',
+        });
+        if (msg.type === 'GET_TRANSLATION') {
+          sendResponse(summaryResult);
+          return;
+        }
         console.log('[background] 요약 결과 수신:', summaryResult);
 
         // 캐시 저장
@@ -50,8 +57,8 @@ const pageText = await new Promise((resolve, reject) => {
         chrome.notifications.create({
           type: 'basic',
           iconUrl: 'img/logo-48.png',
-          title: '요약 완료',
-          message: '페이지 요약이 완료되었습니다!',
+          title: msg.language === 'en' ? 'Summary ready' : '요약 완료',
+          message: msg.language === 'en' ? 'Your page summary is ready.' : '페이지 요약이 완료되었습니다!',
         });
 
         sendResponse(summaryResult);

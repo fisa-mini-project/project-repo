@@ -1,8 +1,8 @@
 import { requestSummary } from './llmClient.js'
 
-export async function requestLLMSummary(text) {
+export async function requestLLMSummary(text, options) {
   try {
-    return await requestSummary(text, import.meta.env)
+    return await requestSummary(text, import.meta.env, fetch, options)
   } catch (error) {
     console.error('[요약 실패]', error.name)
     throw new Error(error.name === 'TimeoutError'

@@ -96,3 +96,14 @@ test('switches providers after rate limiting and invalid evidence', async () => 
     ['ollama.com', 'Bearer ollama-test', 'gpt-oss:120b'],
   ])
 })
+
+test('translation requests the selected language and reports partial coverage', async () => {
+  const result = await requestSummary('a'.repeat(2001), { GROQ_API_KEY: 'test' }, async (_, options) => {
+    const [system, user] = JSON.parse(options.body).messages
+    assert.match(system.content, /Japanese/)
+    assert.equal(JSON.parse(user.content).text.length, 2000)
+    return Response.json({ choices: [{ message: { content: '{"translation":"translation"}' } }] })
+  }, { language: 'ja', translate: true })
+  assert.equal(result.translation, 'translation')
+  assert.equal(result.coverage.truncated, true)
+})

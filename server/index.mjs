@@ -1,3 +1,4 @@
+import { readingLanguages } from './languages.mjs'
 import { createServer } from 'node:http'
 import { requestSummary } from './llmClient.mjs'
 
@@ -12,7 +13,7 @@ const server = createServer(async (req, res) => {
   }
 
   if (req.method === 'GET' && req.url === '/health') return reply(200, { ok: true })
-  if (req.method !== 'POST' || req.url !== '/api/summary') return reply(404, { error: 'not_found' })
+  if (req.method !== 'POST' || !['/api/summary', '/api/translation'].includes(req.url)) return reply(404, { error: 'not_found' })
   if (active >= 4) return reply(429, { error: 'busy' })
 
   active++
@@ -38,7 +39,14 @@ const server = createServer(async (req, res) => {
       return reply(400, { error: 'text_required' })
     }
 
-    reply(200, await requestSummary(input.text, process.env))
+    const language = input.language === undefined ? 'ko' : input.language
+    if (typeof language !== 'string' || !Object.hasOwn(readingLanguages, language)) {
+      return reply(400, { error: 'unsupported_language' })
+    }
+    reply(200, await requestSummary(input.text, process.env, fetch, {
+      language,
+      translate: req.url === '/api/translation',
+    }))
   } catch (error) {
     console.error('Summary request failed:', error.name)
     if (!res.destroyed) reply(error.name === 'TimeoutError' ? 504 : 502, { error: 'summary_failed' })

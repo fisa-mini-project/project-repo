@@ -1,6 +1,7 @@
+import { readingLanguages } from '../reader/languages'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export function useReader(currentUrl) {
+export function useReader(currentUrl, language = 'ko') {
   const [summary, setSummary] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -32,7 +33,7 @@ export function useReader(currentUrl) {
       speechVersion.current += 1
       window.speechSynthesis?.cancel()
     }
-  }, [currentUrl, stopSpeaking])
+  }, [currentUrl, language, stopSpeaking])
 
   const requestSummary = useCallback(() => {
     if (!canSummarize || pending.current) return
@@ -55,7 +56,7 @@ export function useReader(currentUrl) {
       requestVersion.current += 1
     }, 65000)
     try {
-      chrome.runtime.sendMessage({ type: 'GET_SUMMARY' }, (response) => {
+      chrome.runtime.sendMessage({ type: 'GET_SUMMARY', ...(language !== 'ko' && { language }) }, (response) => {
         const lastError = chrome.runtime.lastError
         if (version !== requestVersion.current) return
         if (lastError || response?.error || !response?.summary || !response?.title) {
@@ -79,7 +80,7 @@ export function useReader(currentUrl) {
     } catch {
       fail('확장 프로그램 연결이 끊겼어요. 웹페이지를 새로고침하고 다시 시도해 주세요.')
     }
-  }, [canSummarize, stopSpeaking])
+  }, [canSummarize, language, stopSpeaking])
 
   const speakSummary = useCallback(() => {
     if (!summary?.summary || !canSpeak) return
@@ -88,14 +89,14 @@ export function useReader(currentUrl) {
     const version = speechVersion.current
     const spokenText = [
       summary.title,
-      summary.coverage?.truncated ? '긴 글의 앞부분만 요약한 결과예요.' : '',
+      language === 'ko' && summary.coverage?.truncated ? '긴 글의 앞부분만 요약한 결과예요.' : '',
       summary.summary,
       ...(summary.keyPoints || []).map(item => item.text),
-      summary.cautions?.length ? '주의할 조건입니다.' : '',
+      language === 'ko' && summary.cautions?.length ? '주의할 조건입니다.' : '',
       ...(summary.cautions || []).map(item => item.text),
     ].filter(Boolean).join('\n')
     const utterance = new SpeechSynthesisUtterance(spokenText)
-    utterance.lang = 'ko-KR'
+    utterance.lang = readingLanguages[language].locale
     utterance.rate = 0.9
     utterance.onend = () => {
       if (version === speechVersion.current) setIsSpeaking(false)
@@ -114,7 +115,7 @@ export function useReader(currentUrl) {
       setIsSpeaking(false)
       setSpeechError('소리를 재생하지 못했어요. 기기의 음성 설정을 확인해 주세요.')
     }
-  }, [summary, canSpeak, stopSpeaking])
+  }, [summary, canSpeak, language, stopSpeaking])
 
   return {
     summary,

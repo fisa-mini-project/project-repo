@@ -203,6 +203,8 @@ test('WCAG checks, keyboard focus, target sizes and narrow/large-text layout', a
 }, testInfo) => {
   await expect(page.getByRole('button', { name: /주소 복사/ })).toBeEnabled()
   await page.keyboard.press('Tab')
+  await expect(page.getByRole('button', { name: '영어로 전환' })).toBeFocused()
+  await page.keyboard.press('Tab')
   await expect(page.getByRole('button', { name: /주소 복사/ })).toBeFocused()
   await page.keyboard.press('Tab')
   await expect(page.getByRole('button', { name: '이 페이지 요약하기', exact: true })).toBeFocused()
@@ -245,4 +247,26 @@ test('WCAG checks, keyboard focus, target sizes and narrow/large-text layout', a
   await page.getByRole('button', { name: '보통', exact: true }).click()
   await page.evaluate(() => (document.documentElement.style.fontSize = '32px'))
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+})
+
+test('English toggle persists and requests translation in the active language', async ({ page }) => {
+  await page.evaluate(() => {
+    chrome.runtime.sendMessage = async message => {
+      window.__translationRequest = message
+      return { translation: message.language === 'en' ? 'Translated text' : '번역된 본문' }
+    }
+  })
+  await page.getByRole('button', { name: '영어로 전환' }).click()
+  await expect(page.getByRole('heading', { name: 'Reading settings' })).toBeVisible()
+  await page.getByRole('button', { name: 'Translate page text' }).click()
+  await expect(page.getByText('Translated text')).toBeVisible()
+  expect(await page.evaluate(() => window.__translationRequest.language)).toBe('en')
+  await page.getByRole('button', { name: 'Switch to Korean' }).click()
+  await expect(page.getByText('Translated text')).toHaveCount(0)
+  await page.getByRole('button', { name: '본문 번역하기' }).click()
+  await expect(page.getByText('번역된 본문')).toBeVisible()
+  expect(await page.evaluate(() => window.__translationRequest.language)).toBe('ko')
+  await page.getByRole('button', { name: '영어로 전환' }).click()
+  await page.reload()
+  await expect(page.getByRole('button', { name: 'Translate page text' })).toBeVisible()
 })

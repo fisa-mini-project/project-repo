@@ -37,7 +37,7 @@ node --env-file=C:/Users/SSAFY/Downloads/env index.mjs
 
 별도 터미널의 저장소 루트에서 `npm ci`를 실행합니다. 로컬 테스트는 기본 서버 주소를 사용합니다.
 
-Chrome 웹 스토어에 제출할 빌드는 루트의 `.env.local`에 `VITE_SUMMARY_SERVER_URL=https://your-server.example`을 설정한 다음 `npm run zip`으로 만듭니다. `package/Easy-Reader-1.3.zip`에 확장프로그램 빌드만 담깁니다.
+Chrome 웹 스토어에 제출할 빌드는 루트의 `.env.local`에 `VITE_SUMMARY_SERVER_URL=https://your-server.example`을 설정한 다음 `npm run zip`으로 만듭니다. `package/Easy-Reader-1.4.zip`에 확장프로그램 빌드만 담깁니다.
 
 호스팅 서비스에서 서버 프로젝트 폴더를 고를 때는 `server/`를 선택하고 시작 명령은 `npm start`로 설정합니다. 호스팅 환경변수에서 `BIND_HOST=0.0.0.0`, `GROQ_API_KEY`, `NVIDIA_API_KEY`, `OLLAMA_API_KEY`를 설정합니다. `PORT`는 호스팅 서비스가 제공하는 값을 사용합니다. 공개 배포 전에 요약 API에 인증과 호출량 제한을 적용해야 합니다.
 

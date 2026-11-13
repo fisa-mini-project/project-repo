@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Check, Volume2, Square } from 'lucide-react'
 
-function SummaryItems({ title, items }) {
+function SummaryItems({ title, items, t }) {
   if (!items?.length) return null
   return <section className="summary-section">
     <h4>{title}</h4>
     <ul>{items.map((item, index) => <li key={index}>
       <p>{item.text}</p>
       <details className="evidence">
-        <summary>원문 근거 보기</summary>
+        <summary>{t('원문 근거 보기')}</summary>
         <blockquote>{item.evidence}</blockquote>
       </details>
     </li>)}</ul>
@@ -28,7 +28,7 @@ function SummarySkeleton() {
   )
 }
 
-export function SummarySection({ reader }) {
+export function SummarySection({ reader, t }) {
   const {
     summary,
     isLoading,
@@ -48,28 +48,28 @@ export function SummarySection({ reader }) {
   }, [isLoading])
   const status = isLoading
     ? isSlow
-      ? '평소보다 조금 더 걸리고 있어요. 잠시만 기다려 주세요.'
-      : '페이지 내용을 요약하고 있어요.'
+      ? t('평소보다 조금 더 걸리고 있어요. 잠시만 기다려 주세요.')
+      : t('페이지 내용을 요약하고 있어요.')
     : error
       ? ''
       : isSpeaking
-        ? '요약을 소리로 읽고 있어요.'
+        ? t('요약을 소리로 읽고 있어요.')
         : summary
-          ? '요약이 준비됐어요.'
-          : '요약하기를 누르면 핵심 내용이 표시됩니다.'
+          ? t('요약이 준비됐어요.')
+          : t('요약하기를 누르면 핵심 내용이 표시됩니다.')
   return (
     <section className="result" aria-labelledby="result-title">
       <div className="section-heading">
-        <h2 id="result-title">요약</h2>
+        <h2 id="result-title">{t('요약')}</h2>
         {summary && (
           <span className="complete">
             <Check size={16} aria-hidden="true" />
-            완료
+            {t('완료')}
           </span>
         )}
         {isLoading && (
           <span className="loading-label" aria-hidden="true">
-            정리 중
+            {t('정리 중')}
           </span>
         )}
       </div>
@@ -82,16 +82,16 @@ export function SummarySection({ reader }) {
           <SummarySkeleton />
         ) : error ? (
           <p className="error-message" role="alert">
-            {error}
+            {t(error)}
           </p>
         ) : summary ? (
           <article className="summary-text">
             <h3>{summary.title}</h3>
-            {summary.coverage?.truncated && <p className="coverage-note">글이 길어 앞 48,000자만 요약했어요. 뒷부분의 조건은 원문에서 확인해 주세요.</p>}
-            {summary.keyPoints?.length > 0 && <h4 className="overview-heading">한눈에 보기</h4>}
+            {summary.coverage?.truncated && <p className="coverage-note">{t('글이 길어 앞 48,000자만 요약했어요. 뒷부분의 조건은 원문에서 확인해 주세요.')}</p>}
+            {summary.keyPoints?.length > 0 && <h4 className="overview-heading">{t('한눈에 보기')}</h4>}
             <p>{summary.summary}</p>
-            <SummaryItems title="핵심 내용" items={summary.keyPoints} />
-            <SummaryItems title="주의할 조건" items={summary.cautions} />
+            <SummaryItems t={t} title={t('핵심 내용')} items={summary.keyPoints} />
+            <SummaryItems t={t} title={t('주의할 조건')} items={summary.cautions} />
           </article>
         ) : null}
       </div>
@@ -105,12 +105,12 @@ export function SummarySection({ reader }) {
         ) : (
           <Volume2 size={22} aria-hidden="true" />
         )}
-        {isSpeaking ? '읽기 중지' : '소리로 듣기'}
+        {isSpeaking ? t('읽기 중지') : t('소리로 듣기')}
       </button>
-      {!canSpeak && <p className="page-help">이 브라우저에서는 소리로 듣기를 지원하지 않아요.</p>}
+      {!canSpeak && <p className="page-help">{t('이 브라우저에서는 소리로 듣기를 지원하지 않아요.')}</p>}
       {speechError && (
         <p className="error-message" role="alert">
-          {speechError}
+          {t(speechError)}
         </p>
       )}
     </section>
