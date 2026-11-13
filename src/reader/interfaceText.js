@@ -1,4 +1,5 @@
 const english = {
+  "요약 서버가 시작 중이거나 연결할 수 없어요. 잠시 후 다시 시도해 주세요.": "The summary server is starting or unavailable. Try again in a moment.",
   "페이지 요약": "Page summary",
   "요약 중": "Summarizing",
   "다시 시도하기": "Try again",
@@ -38,11 +39,6 @@ const english = {
   "고대비": "High contrast",
   "켜짐": "On",
   "꺼짐": "Off",
-  "본문 번역": "Page translation",
-  "번역 중": "Translating",
-  "본문 번역하기": "Translate page text",
-  "번역을 가져오지 못했어요. 잠시 후 다시 시도해 주세요.": "Could not load the translation. Try again in a moment.",
-  "긴 글의 앞부분 2,000자만 번역했어요.": "This translation covers the first 2,000 characters.",
   "응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.": "The response is taking too long. Try again in a moment.",
   "요청이 많아 잠시 쉬고 있어요. 잠시 후 다시 시도해 주세요.": "The service is busy. Try again in a moment.",
   "원문과 맞는지 확인하지 못했어요. 다시 요약해 주세요.": "Could not verify the summary against the source. Try again.",

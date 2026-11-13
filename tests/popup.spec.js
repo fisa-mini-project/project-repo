@@ -249,24 +249,26 @@ test('WCAG checks, keyboard focus, target sizes and narrow/large-text layout', a
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 
-test('English toggle persists and requests translation in the active language', async ({ page }) => {
+test('the active interface language determines the summary language', async ({ page }) => {
   await page.evaluate(() => {
-    chrome.runtime.sendMessage = async message => {
-      window.__translationRequest = message
-      return { translation: message.language === 'en' ? 'Translated text' : '번역된 본문' }
+    chrome.runtime.sendMessage = (message, reply) => {
+      window.__request = message
+      reply(message.language === 'en'
+        ? { title: 'English result', summary: 'English summary' }
+        : { title: '한국어 결과', summary: '한국어 요약' })
     }
   })
   await page.getByRole('button', { name: '영어로 전환' }).click()
-  await expect(page.getByRole('heading', { name: 'Reading settings' })).toBeVisible()
-  await page.getByRole('button', { name: 'Translate page text' }).click()
-  await expect(page.getByText('Translated text')).toBeVisible()
-  expect(await page.evaluate(() => window.__translationRequest.language)).toBe('en')
-  await page.getByRole('button', { name: 'Switch to Korean' }).click()
-  await expect(page.getByText('Translated text')).toHaveCount(0)
-  await page.getByRole('button', { name: '본문 번역하기' }).click()
-  await expect(page.getByText('번역된 본문')).toBeVisible()
-  expect(await page.evaluate(() => window.__translationRequest.language)).toBe('ko')
-  await page.getByRole('button', { name: '영어로 전환' }).click()
+  await expect(page.getByRole('button', { name: 'Translate page text' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Summarize this page' }).click()
+  await expect(page.getByRole('heading', { name: 'English result' })).toBeVisible()
+  expect(await page.evaluate(() => window.__request)).toEqual({ type: 'GET_SUMMARY', language: 'en' })
   await page.reload()
-  await expect(page.getByRole('button', { name: 'Translate page text' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Summarize this page' })).toBeVisible()
+  await page.evaluate(() => {
+    chrome.runtime.sendMessage = (_message, reply) => reply({ title: '한국어 결과', summary: '한국어 요약' })
+  })
+  await page.getByRole('button', { name: 'Switch to Korean' }).click()
+  await page.getByRole('button', { name: '이 페이지 요약하기' }).click()
+  await expect(page.getByRole('heading', { name: '한국어 결과' })).toBeVisible()
 })

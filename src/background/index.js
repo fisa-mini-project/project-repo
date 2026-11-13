@@ -1,7 +1,7 @@
 import { requestLLMSummary } from './requestLLMSummary.js';
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (['GET_SUMMARY', 'GET_TRANSLATION'].includes(msg.type)) {
+  if (msg.type === 'GET_SUMMARY') {
     (async () => {
       try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -10,60 +10,32 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           sendResponse({ error: '탭 없음' });
           return;
         }
-        console.log('[background] 활성 탭 ID:', tab.id);
-
-        // content script 동적 주입 시도
+        const crawl = () => chrome.tabs.sendMessage(tab.id, { type: 'CRAWL_PAGE_TEXT' });
+        let page;
         try {
+          page = await crawl();
+        } catch {
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
-            files: [ 'lib/readability.js', 'assets/contentScript.js'], // 실제 빌드 산출물 경로 확인 필요
+            files: ['lib/readability.js', 'assets/contentScript.js'],
           });
-          console.log('[background] content script 주입 성공');
-        } catch (injErr) {
-          console.error('[background] content script 주입 실패:', injErr);
-          // 주입 실패는 크리티컬, 여기서 바로 종료하지 않고 시도 계속 가능 여부 판단
+          page = await crawl();
         }
+        if (!page?.text?.trim()) throw new Error('SUMMARY_NO_TEXT');
 
-        // 페이지 본문 텍스트 요청
-await new Promise(res => setTimeout(res, 150));
+        const summaryResult = await requestLLMSummary(page.text, { language: msg.language });
+        sendResponse(summaryResult);
 
-const pageText = await new Promise((resolve, reject) => {
-  chrome.tabs.sendMessage(tab.id, { type: 'CRAWL_PAGE_TEXT' }, (res) => {
-    if (chrome.runtime.lastError) {
-      reject(new Error('content script 미주입'));
-    } else if (!res?.text) {
-      reject(new Error('본문 추출 실패'));
-    } else {
-      resolve(res.text);
-    }
-  });
-});
-        // 요약 요청
-        const summaryResult = await requestLLMSummary(pageText, {
-          language: msg.language,
-          translate: msg.type === 'GET_TRANSLATION',
-        });
-        if (msg.type === 'GET_TRANSLATION') {
-          sendResponse(summaryResult);
-          return;
-        }
-        console.log('[background] 요약 결과 수신:', summaryResult);
-
-        // 캐시 저장
-        await chrome.storage.local.set({ lastSummary: summaryResult });
-        console.log('[background] 캐시 저장 완료');
-
-        // 알림 발송
-        chrome.notifications.create({
+        // Storage and notifications should not turn a successful summary into an error.
+        void chrome.storage.local.set({ lastSummary: summaryResult }).catch(() => {});
+        void chrome.notifications.create({
           type: 'basic',
           iconUrl: 'img/logo-48.png',
           title: msg.language === 'en' ? 'Summary ready' : '요약 완료',
           message: msg.language === 'en' ? 'Your page summary is ready.' : '페이지 요약이 완료되었습니다!',
-        });
-
-        sendResponse(summaryResult);
+        }).catch(() => {});
       } catch (err) {
-        console.error('[background] 요약 오류 발생:', err);
+        console.error('[background] 요약 오류:', err.name);
         sendResponse({ error: err.message || '알 수 없는 오류' });
       }
     })();

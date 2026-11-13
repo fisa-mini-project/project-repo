@@ -1,5 +1,4 @@
 import { interfaceText } from './interfaceText'
-import { TranslationSection } from './TranslationSection'
 import { BookOpen, FileText, LoaderCircle } from 'lucide-react'
 import { useFontSize, fontSizeMap } from '../contexts/FontSizeContext'
 import { useCurrentTabUrl } from '../hooks/useCurrentTabUrl'
@@ -62,7 +61,6 @@ export function ReaderScreen({ isHighContrast, toggleContrast, language, toggleL
         )}
       </section>
       <SummarySection reader={reader} t={t} />
-      {canSummarize && <TranslationSection key={JSON.stringify([currentUrl, language])} language={language} t={t} />}
       <ReadingControls isHighContrast={isHighContrast} toggleContrast={toggleContrast} t={t} />
       <footer className="reader-footer">
         {t('AI 요약은 틀릴 수 있어요. 중요한 내용은 원문도 확인해 주세요.')}

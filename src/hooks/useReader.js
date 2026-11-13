@@ -62,12 +62,10 @@ export function useReader(currentUrl, language = 'ko') {
         if (lastError || response?.error || !response?.summary || !response?.title) {
           const message = response?.error || ''
           fail(
-            message.includes('429')
+            /429/.test(message)
               ? '요청이 많아 잠시 쉬고 있어요. 잠시 후 다시 시도해 주세요.'
-              : message.includes('원문 근거')
-                ? '원문과 맞는지 확인하지 못했어요. 다시 요약해 주세요.'
-              : /401|403/.test(message)
-                ? '요약 서비스에 연결할 수 없어요. API 키 설정을 확인해 주세요.'
+              : message === 'SUMMARY_SERVER_UNAVAILABLE'
+                ? '요약 서버가 시작 중이거나 연결할 수 없어요. 잠시 후 다시 시도해 주세요.'
                 : '요약을 가져오지 못했어요. 웹페이지를 새로고침하고 다시 시도해 주세요.',
           )
           return
